@@ -71,7 +71,7 @@
                 </div>
                 <div class="bg-[#0b0f19] border border-[#30363d] px-3 py-1.5 rounded-lg text-xs">
                     <span class="text-gray-400 block text-[10px]">Takt Time (s) ✎</span>
-                    <input type="text" id="input-takt" value="48.04s" class="bg-transparent font-bold text-amber-400 w-full focus:outline-none focus:border-blue-500 border-b border-transparent">
+                    <input type="text" id="input-takt" value="48.04" oninput="recalcularTotales()" class="bg-transparent font-bold text-amber-400 w-full focus:outline-none focus:border-blue-500 border-b border-transparent">
                 </div>
             </div>
         </header>
@@ -132,7 +132,7 @@
 
             </div>
 
-            <!-- Columna Derecha: Desglose de Elementos y Cronometraje de Ciclo -->
+            <!-- Columna Derecha: Desglose de Elementos e Indicador de Ciclo Total -->
             <div class="lg:col-span-7 space-y-4">
                 <div class="app-card p-4 rounded-xl shadow-lg space-y-4">
                     
@@ -144,33 +144,32 @@
                             <p class="text-[11px] text-gray-400">Tiempos Observados (To), Valoración (R) y Tiempo Básico (Tb)</p>
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
+                            <button class="bg-amber-600 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg shadow flex items-center space-x-1">
+                                <span>⏱</span><span>Tiempo Ciclo Total</span>
+                            </button>
                             <button onclick="abrirModalNuevoElemento()" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg shadow transition">
                                 + Nuevo Elemento
                             </button>
                         </div>
                     </div>
 
-                    <!-- Tarjeta de Ciclo Total y Botón Cronometrar Ciclo -->
-                    <div class="bg-[#0b0f19] border border-[#30363d] p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3">
-                        <div class="flex items-center space-x-3 w-full sm:w-auto">
+                    <!-- Tarjeta Idéntica a la Imagen con el Cronómetro de Ciclo Total Operación -->
+                    <div class="bg-[#0b0f19] border border-[#30363d] p-3.5 rounded-xl space-y-2">
+                        <div class="flex items-center space-x-3">
                             <div class="bg-amber-500/20 text-amber-400 p-2 rounded-lg text-sm">⏱</div>
                             <div>
                                 <span class="text-[10px] text-gray-400 uppercase tracking-wider block">TIEMPO DE CICLO TOTAL OPERACIÓN</span>
-                                <div class="text-lg font-mono font-bold text-amber-400" id="txt-ciclo-total">0.00 s</div>
+                                <div class="text-2xl font-mono font-extrabold text-amber-400 tracking-wide" id="txt-ciclo-total">15.00 s</div>
                             </div>
                         </div>
-
-                        <!-- Botón y visualizador para cronometrar ciclo completo -->
-                        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-                            <span id="display-ciclo-mini" class="text-xs font-mono text-gray-400">00:00.00</span>
-                            <button onclick="toggleCronometrarCiclo()" id="btn-cronometrar-ciclo" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1">
-                                <span>▶</span><span>Cronometrar Ciclo</span>
-                            </button>
+                        <div class="flex flex-col sm:flex-row justify-between text-[11px] text-gray-400 border-t border-[#30363d] pt-2 font-mono">
+                            <div>Suma Elementos (To): <span id="txt-suma-to" class="text-blue-400 font-semibold">15.00 s</span></div>
+                            <div id="txt-remanente" class="text-amber-300 font-semibold">+33.04 s lib. (31.2% medido)</div>
                         </div>
                     </div>
 
                     <!-- Tabla de Elementos -->
-                    <div class="overflow-x-auto border border-[#30363d] rounded-xl max-h-[380px]">
+                    <div class="overflow-x-auto border border-[#30363d] rounded-xl max-h-[350px]">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-[#0b0f19] text-[10px] text-gray-400 border-b border-[#30363d] sticky top-0">
@@ -204,18 +203,13 @@
 
     </div>
 
-    <!-- Script con la Lógica de Cronometraje Integrada -->
+    <!-- Script con la Lógica de Cálculo Exacta -->
     <script>
         let timerInterval = null;
         let tiempoInicio = 0;
         let tiempoAcumuladoPausa = 0;
         let estaCorriendo = false;
         let contadorTomas = 0;
-
-        // Variables para el Cronometraje de Ciclo General
-        let cicloInterval = null;
-        let cicloInicio = 0;
-        let estaCronometrandoCiclo = false;
 
         let elementosEstudio = [
             { id: 1, nombre: "1. 4. 1- Alineación de conformadores", tipo: "Manual", to: 3.00, ritmo: 100, n: 1 },
@@ -243,4 +237,243 @@
         }
 
         function renderizarTablaElementos() {
-            let cuerpo = document.getElementById('cuerpo-tabla-elementos
+            let cuerpo = document.getElementById('cuerpo-tabla-elementos');
+            cuerpo.innerHTML = "";
+
+            elementosEstudio.forEach((el, index) => {
+                let tb = ((el.to * el.ritmo) / 100).toFixed(2);
+                let fila = document.createElement('tr');
+                fila.className = "hover:bg-[#1f242c] transition";
+                fila.innerHTML = `
+                    <td class="p-2.5 font-medium text-gray-200">${el.nombre}</td>
+                    <td class="p-2.5 text-center"><span class="bg-[#21262d] text-gray-300 text-[10px] px-2 py-0.5 rounded border border-[#30363d]">${el.tipo}</span></td>
+                    <td class="p-2.5 text-center font-mono">${el.n}</td>
+                    <td class="p-2.5 text-right font-mono text-gray-200">${el.to.toFixed(2)}s</td>
+                    <td class="p-2.5 text-center font-mono">
+                        <input type="number" value="${el.ritmo}" onchange="cambiarRitmoElemento(${index}, this.value)" class="w-14 bg-[#0b0f19] border border-[#30363d] text-center text-amber-400 rounded py-0.5 text-xs focus:outline-none focus:border-blue-500">
+                    </td>
+                    <td class="p-2.5 text-right font-mono text-amber-400 font-bold">${tb}s</td>
+                    <td class="p-2.5 text-center">
+                        <button onclick="eliminarElemento(${index})" class="bg-red-900/40 hover:bg-red-900/70 text-red-300 px-2 py-1 rounded text-xs transition">🗑</button>
+                    </td>
+                `;
+                cuerpo.appendChild(fila);
+            });
+        }
+
+        function cambiarRitmoElemento(index, nuevoRitmo) {
+            elementosEstudio[index].ritmo = parseFloat(nuevoRitmo) || 100;
+            renderizarTablaElementos();
+            recalcularTotales();
+        }
+
+        function eliminarElemento(index) {
+            elementosEstudio.splice(index, 1);
+            actualizarSelectElementos();
+            renderizarTablaElementos();
+            recalcularTotales();
+        }
+
+        function abrirModalNuevoElemento() {
+            let nombre = prompt("Ingrese el nombre del nuevo elemento:");
+            if (!nombre) return;
+            let tipo = prompt("Tipo (Manual / Máquina):", "Manual");
+            
+            elementosEstudio.push({
+                id: elementosEstudio.length + 1,
+                nombre: `${elementosEstudio.length + 1}. ${nombre}`,
+                tipo: tipo || "Manual",
+                to: 3.00,
+                ritmo: 100,
+                n: 1
+            });
+
+            actualizarSelectElementos();
+            renderizarTablaElementos();
+            recalcularTotales();
+        }
+
+        function recalcularTotales() {
+            let sumaTo = 0;
+            elementosEstudio.forEach(el => {
+                sumaTo += el.to;
+            });
+
+            document.getElementById('txt-ciclo-total').innerText = sumaTo.toFixed(2) + " s";
+            document.getElementById('txt-suma-to').innerText = sumaTo.toFixed(2) + " s";
+
+            let taktInput = document.getElementById('input-takt').value.replace('s', '').trim();
+            let taktVal = parseFloat(taktInput) || 48.04;
+            let diferencia = taktVal - sumaTo;
+            let porcentajeMedido = taktVal > 0 ? ((sumaTo / taktVal) * 100).toFixed(1) : 0;
+
+            let textoRemanente = diferencia >= 0 
+                ? `+${diferencia.toFixed(2)} s lib. (${porcentajeMedido}% medido)` 
+                : `${diferencia.toFixed(2)} s sobre Takt`;
+            
+            document.getElementById('txt-remanente').innerText = textoRemanente;
+        }
+
+        function actualizarRitmo(val) {
+            document.getElementById('ritmo-val').innerText = val + ' %';
+            let indexSel = document.getElementById('select-elemento').value;
+            if(elementosEstudio[indexSel]) {
+                elementosEstudio[indexSel].ritmo = parseInt(val);
+                renderizarTablaElementos();
+                recalcularTotales();
+            }
+        }
+
+        function actualizarSeleccionActiva() {
+            let indexSel = document.getElementById('select-elemento').value;
+            if(elementosEstudio[indexSel]) {
+                document.getElementById('range-ritmo').value = elementosEstudio[indexSel].ritmo;
+                document.getElementById('ritmo-val').innerText = elementosEstudio[indexSel].ritmo + ' %';
+            }
+        }
+
+        function cambiarTab(num) {
+            for(let i=1; i<=6; i++) {
+                let btn = document.getElementById('tab-btn-' + i);
+                if(i === num) {
+                    btn.className = "bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap shadow";
+                } else {
+                    btn.className = "text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition";
+                }
+            }
+
+            const secCronometro = document.getElementById('seccion-1');
+            const secExtra = document.getElementById('seccion-contenido-extra');
+            const tituloExtra = document.getElementById('titulo-seccion-activa');
+
+            if(num === 1) {
+                secCronometro.classList.remove('hidden');
+                secExtra.classList.add('hidden');
+            } else {
+                secCronometro.classList.add('hidden');
+                secExtra.classList.remove('hidden');
+                const nombresTabs = ["", "1. Cronómetro", "2. Hojas de Proceso / Ergonomía", "3. Suplementos y Tolerancias", "4. Línea de Balance / Multitarea", "5. Análisis de Costos y Takt Time", "6. Dashboard de Productividad"];
+                tituloExtra.innerText = nombresTabs[num];
+            }
+        }
+
+        function toggleCronometro() {
+            const btn = document.getElementById('btn-iniciar');
+            if (!estaCorriendo) {
+                estaCorriendo = true;
+                btn.innerText = "⏸ Pausar";
+                btn.className = "flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition";
+                
+                tiempoInicio = Date.now() - tiempoAcumuladoPausa;
+                timerInterval = setInterval(() => {
+                    let tiempoActual = Date.now() - tiempoInicio;
+                    document.getElementById('display-cronometro').innerText = formatearTiempo(tiempoActual);
+                }, 10);
+            } else {
+                pausarCronometro();
+            }
+        }
+
+        function pausarCronometro() {
+            if (!estaCorriendo) return;
+            estaCorriendo = false;
+            clearInterval(timerInterval);
+            tiempoAcumuladoPausa = Date.now() - tiempoInicio;
+            const btn = document.getElementById('btn-iniciar');
+            btn.innerText = "▶ Reanudar";
+            btn.className = "flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition";
+        }
+
+        function resetCronometro() {
+            pausarCronometro();
+            tiempoAcumuladoPausa = 0;
+            tiempoInicio = 0;
+            document.getElementById('display-cronometro').innerText = "00:00.00";
+            document.getElementById('txt-acumulado').innerText = "00:00.00";
+            document.getElementById('txt-lap').innerText = "00:00.00";
+            const btn = document.getElementById('btn-iniciar');
+            btn.innerText = "▶ Iniciar / Parar";
+        }
+
+        function registrarLap() {
+            let tiempoActualMs = estaCorriendo ? (Date.now() - tiempoInicio) : tiempoAcumuladoPausa;
+            if (tiempoActualMs === 0) return;
+
+            contadorTomas++;
+            let tiempoActualStr = formatearTiempo(tiempoActualMs);
+            let tiempoSeg = parseFloat((tiempoActualMs / 1000).toFixed(2));
+            
+            let indexSel = document.getElementById('select-elemento').value;
+            if(elementosEstudio[indexSel]) {
+                elementosEstudio[indexSel].to = tiempoSeg;
+                elementosEstudio[indexSel].n = contadorTomas;
+                renderizarTablaElementos();
+                recalcularTotales();
+            }
+
+            document.getElementById('txt-lap').innerText = tiempoActualStr;
+            document.getElementById('txt-acumulado').innerText = tiempoActualStr;
+            document.getElementById('txt-tomas').innerText = "Tomas: " + contadorTomas;
+
+            resetCronometro();
+            toggleCronometro();
+        }
+
+        function formatearTiempo(ms) {
+            let min = Math.floor(ms / 60000);
+            let seg = Math.floor((ms % 60000) / 1000);
+            let cent = Math.floor((ms % 1000) / 10);
+            return (min < 10 ? "0" : "") + min + ":" + 
+                   (seg < 10 ? "0" : "") + seg + "." + 
+                   (cent < 10 ? "0" : "") + cent;
+        }
+
+        function descargarExcelNativo() {
+            if (typeof XLSX === 'undefined') {
+                alert('La librería de Excel se está cargando. Intente de nuevo.');
+                return;
+            }
+
+            let estudioVal = document.getElementById('input-estudio').value;
+            let operarioVal = document.getElementById('input-operario').value;
+            let taktVal = document.getElementById('input-takt').value;
+
+            let wb = XLSX.utils.book_new();
+            
+            let datos = [
+                ["IE-Pro v3.6.3 - Reporte de Estudio de Tiempos"],
+                ["Estudio:", estudioVal],
+                ["Operario:", operarioVal],
+                ["Takt Time:", taktVal],
+                [""],
+                ["# / Elemento", "Tipo", "N", "To (s)", "Ritmo (%)", "Tb (s)"]
+            ];
+
+            elementosEstudio.forEach(el => {
+                let tb = (el.to * el.ritmo) / 100;
+                datos.push([el.nombre, el.tipo, el.n, el.to, el.ritmo, tb]);
+            });
+
+            let ws = XLSX.utils.aoa_to_sheet(datos);
+            XLSX.utils.book_append_sheet(wb, ws, "Desglose de Elementos");
+            XLSX.writeFile(wb, "Estudio_" + estudioVal.replace(/\s+/g, '_') + ".xlsx");
+        }
+
+        function exportarJSON() {
+            let datosEstudio = {
+                estudio: document.getElementById('input-estudio').value,
+                operario: document.getElementById('input-operario').value,
+                taktTime: document.getElementById('input-takt').value,
+                elementos: elementosEstudio
+            };
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosEstudio, null, 2));
+            let a = document.createElement('a');
+            a.href = dataStr;
+            a.download = "IE_Pro_Respaldo_Estudio.json";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
