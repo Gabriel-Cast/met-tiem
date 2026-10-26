@@ -109,7 +109,7 @@
                     </div>
 
                     <div class="flex justify-between text-xs text-gray-400 px-1 font-mono">
-                        <div>ACUMULADO: <span id="txt-acumulado" class="text-gray-200 font-semibold">00:00.00</span></div>
+                        <div>ACUMULADO TOTAL: <span id="txt-acumulado" class="text-gray-200 font-semibold">00:00.00</span></div>
                         <div>ÚLTIMO LAP: <span id="txt-lap" class="text-gray-200 font-semibold">00:00.00</span></div>
                     </div>
                 </div>
@@ -141,7 +141,7 @@
                             <h2 class="text-sm font-bold text-gray-200 flex items-center space-x-1.5">
                                 <span>📋</span><span>Desglose de Elementos</span>
                             </h2>
-                            <p class="text-[11px] text-gray-400">Tiempos Observados (To), Valoración (R) y Tiempo Básico (Tb)</p>
+                            <p class="text-[11px] text-gray-400">Tiempos Observados (To), Valoración (R) y Promedio</p>
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
                             <button id="btn-top-ciclo" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg shadow transition flex items-center space-x-1">
@@ -159,9 +159,9 @@
                             <div class="flex items-center space-x-3">
                                 <div id="icon-ciclo" class="bg-amber-500/20 text-amber-400 p-2.5 rounded-lg text-lg shadow cursor-pointer">⏱</div>
                                 <div>
-                                    <span class="text-[10px] text-gray-400 uppercase tracking-wider block">TIEMPO DE CICLO TOTAL OPERACIÓN</span>
+                                    <span class="text-[10px] text-gray-400 uppercase tracking-wider block">PROMEDIO CICLO TOTAL OPERACIÓN</span>
                                     <div class="text-2xl font-mono font-extrabold text-amber-400 tracking-wide flex items-center gap-1">
-                                        <span id="txt-ciclo-total">15.00</span>
+                                        <span id="txt-ciclo-total">0.00</span>
                                         <span class="text-sm font-normal text-amber-500">s</span>
                                     </div>
                                 </div>
@@ -176,8 +176,8 @@
                             </div>
                         </div>
                         <div class="flex flex-col sm:flex-row justify-between text-[11px] text-gray-400 border-t border-[#30363d] pt-2 font-mono w-full">
-                            <div>Suma Elementos (To): <span id="txt-suma-to" class="text-blue-400 font-semibold">15.00 s</span></div>
-                            <div id="txt-remanente" class="text-amber-300 font-semibold">+33.04 s lib. (31.2% medido)</div>
+                            <div>Suma Promedios (To): <span id="txt-suma-to" class="text-blue-400 font-semibold">0.00 s</span></div>
+                            <div id="txt-remanente" class="text-amber-300 font-semibold">--</div>
                         </div>
                     </div>
 
@@ -188,8 +188,8 @@
                                 <tr class="bg-[#0b0f19] text-[10px] text-gray-400 border-b border-[#30363d] sticky top-0">
                                     <th class="p-2.5 font-semibold"># / ELEMENTO</th>
                                     <th class="p-2.5 font-semibold text-center">TIPO</th>
-                                    <th class="p-2.5 font-semibold text-center">N</th>
-                                    <th class="p-2.5 font-semibold text-right">TO (S)</th>
+                                    <th class="p-2.5 font-semibold text-center">N (TOMAS)</th>
+                                    <th class="p-2.5 font-semibold text-right">TO PROMEDIO (S)</th>
                                     <th class="p-2.5 font-semibold text-center">RITMO (%)</th>
                                     <th class="p-2.5 font-semibold text-right">TB (S)</th>
                                     <th class="p-2.5 font-semibold text-center">ACCIÓN</th>
@@ -216,15 +216,15 @@
 
     </div>
 
-    <!-- Script con Lógica de Cronometraje Continuo (Sin Reset de Acumulado) -->
+    <!-- Script con Historial de Tomas e Historial Múltiple -->
     <script>
-        // Variables Cronómetro Principal
+        // Variables Cronómetro Principal (Elemento)
         let timerInterval = null;
-        let tiempoInicio = 0;
-        let tiempoAcumuladoPausa = 0;
+        let tiempoInicioElemento = 0;
+        let acumuladoPausaElemento = 0;
         let estaCorriendo = false;
-        let contadorTomas = 0;
-        let ultimoTiempoLapMs = 0;
+        let contadorTomasTotales = 0;
+        let tiempoAcumuladoGeneralMs = 0;
 
         // Variables Cronómetro Ciclo Total
         let cicloInterval = null;
@@ -232,12 +232,13 @@
         let cicloAcumuladoPausa = 0;
         let estaCorriendoCiclo = false;
 
+        // Cada elemento ahora almacena un array de "tomas" (historial)
         let elementosEstudio = [
-            { id: 1, nombre: "1. 4. 1- Alineación de conformadores", tipo: "Manual", to: 3.00, ritmo: 100, n: 1 },
-            { id: 2, nombre: "2. 5. Es cuadrado", tipo: "Manual", to: 3.00, ritmo: 100, n: 1 },
-            { id: 3, nombre: "3. 7. Colocación de desmoldante", tipo: "Manual", to: 3.00, ritmo: 100, n: 1 },
-            { id: 4, nombre: "4. 8. Colocación de armadura", tipo: "Manual", to: 3.00, ritmo: 100, n: 1 },
-            { id: 5, nombre: "5. 9. Colocación de insertos", tipo: "Manual", to: 3.00, ritmo: 100, n: 1 }
+            { id: 1, nombre: "1. 4. 1- Alineación de conformadores", tipo: "Manual", tomas: [], ritmo: 100 },
+            { id: 2, nombre: "2. 5. Es cuadrado", tipo: "Manual", tomas: [], ritmo: 100 },
+            { id: 3, nombre: "3. 7. Colocación de desmoldante", tipo: "Manual", tomas: [], ritmo: 100 },
+            { id: 4, nombre: "4. 8. Colocación de armadura", tipo: "Manual", tomas: [], ritmo: 100 },
+            { id: 5, nombre: "5. 9. Colocación de insertos", tipo: "Manual", tomas: [], ritmo: 100 }
         ];
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -286,19 +287,28 @@
             });
         }
 
+        function calcularPromedio(arrayTomas) {
+            if (arrayTomas.length === 0) return 0;
+            let suma = arrayTomas.reduce((a, b) => a + b, 0);
+            return suma / arrayTomas.length;
+        }
+
         function renderizarTablaElementos() {
             let cuerpo = document.getElementById('cuerpo-tabla-elementos');
             cuerpo.innerHTML = "";
 
             elementosEstudio.forEach((el, index) => {
-                let tb = ((el.to * el.ritmo) / 100).toFixed(2);
+                let promedioTo = calcularPromedio(el.tomas);
+                let tb = ((promedioTo * el.ritmo) / 100).toFixed(2);
+                let nTomas = el.tomas.length;
+
                 let fila = document.createElement('tr');
                 fila.className = "hover:bg-[#1f242c] transition";
                 fila.innerHTML = `
                     <td class="p-2.5 font-medium text-gray-200">${el.nombre}</td>
                     <td class="p-2.5 text-center"><span class="bg-[#21262d] text-gray-300 text-[10px] px-2 py-0.5 rounded border border-[#30363d]">${el.tipo}</span></td>
-                    <td class="p-2.5 text-center font-mono">${el.n}</td>
-                    <td class="p-2.5 text-right font-mono text-gray-200">${el.to.toFixed(2)}s</td>
+                    <td class="p-2.5 text-center font-mono">${nTomas}</td>
+                    <td class="p-2.5 text-right font-mono text-gray-200">${promedioTo.toFixed(2)}s</td>
                     <td class="p-2.5 text-center font-mono">
                         <input type="number" value="${el.ritmo}" onchange="cambiarRitmoElemento(${index}, this.value)" class="w-14 bg-[#0b0f19] border border-[#30363d] text-center text-amber-400 rounded py-0.5 text-xs focus:outline-none focus:border-blue-500">
                     </td>
@@ -333,9 +343,8 @@
                 id: elementosEstudio.length + 1,
                 nombre: `${elementosEstudio.length + 1}. ${nombre}`,
                 tipo: tipo || "Manual",
-                to: 3.00,
-                ritmo: 100,
-                n: 1
+                tomas: [],
+                ritmo: 100
             });
 
             actualizarSelectElementos();
@@ -344,20 +353,20 @@
         }
 
         function recalcularTotales() {
-            let sumaTo = 0;
+            let sumaPromediosTo = 0;
             elementosEstudio.forEach(el => {
-                sumaTo += el.to;
+                sumaPromediosTo += calcularPromedio(el.tomas);
             });
 
             if(!estaCorriendoCiclo && cicloAcumuladoPausa === 0) {
-                document.getElementById('txt-ciclo-total').innerText = sumaTo.toFixed(2);
+                document.getElementById('txt-ciclo-total').innerText = sumaPromediosTo.toFixed(2);
             }
-            document.getElementById('txt-suma-to').innerText = sumaTo.toFixed(2) + " s";
+            document.getElementById('txt-suma-to').innerText = sumaPromediosTo.toFixed(2) + " s";
 
             let taktInput = document.getElementById('input-takt').value.replace('s', '').trim();
             let taktVal = parseFloat(taktInput) || 48.04;
-            let diferencia = taktVal - sumaTo;
-            let porcentajeMedido = taktVal > 0 ? ((sumaTo / taktVal) * 100).toFixed(1) : 0;
+            let diferencia = taktVal - sumaPromediosTo;
+            let porcentajeMedido = taktVal > 0 ? ((sumaPromediosTo / taktVal) * 100).toFixed(1) : 0;
 
             let textoRemanente = diferencia >= 0 
                 ? `+${diferencia.toFixed(2)} s lib. (${porcentajeMedido}% medido)` 
@@ -376,4 +385,207 @@
                 
                 cicloInicio = Date.now() - cicloAcumuladoPausa;
                 cicloInterval = setInterval(() => {
-                    let transcurrido = Date.
+                    let transcurrido = Date.now() - cicloInicio;
+                    document.getElementById('txt-ciclo-total').innerText = (transcurrido / 1000).toFixed(2);
+                }, 10);
+            } else {
+                pausarCronometroCiclo();
+            }
+        }
+
+        function pausarCronometroCiclo() {
+            if (!estaCorriendoCiclo) return;
+            estaCorriendoCiclo = false;
+            clearInterval(cicloInterval);
+            cicloAcumuladoPausa = Date.now() - cicloInicio;
+            const btn = document.getElementById('btn-ciclo-start');
+            btn.innerText = "▶ Reanudar";
+            btn.className = "bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg shadow transition";
+        }
+
+        function resetCronometroCiclo() {
+            pausarCronometroCiclo();
+            cicloAcumuladoPausa = 0;
+            cicloInicio = 0;
+            const btn = document.getElementById('btn-ciclo-start');
+            btn.innerText = "▶ Iniciar";
+            recalcularTotales();
+        }
+
+        function actualizarRitmo(val) {
+            document.getElementById('ritmo-val').innerText = val + ' %';
+            let indexSel = document.getElementById('select-elemento').value;
+            if(elementosEstudio[indexSel]) {
+                elementosEstudio[indexSel].ritmo = parseInt(val);
+                renderizarTablaElementos();
+                recalcularTotales();
+            }
+        }
+
+        function actualizarSeleccionActiva() {
+            let indexSel = document.getElementById('select-elemento').value;
+            if(elementosEstudio[indexSel]) {
+                document.getElementById('range-ritmo').value = elementosEstudio[indexSel].ritmo;
+                document.getElementById('ritmo-val').innerText = elementosEstudio[indexSel].ritmo + ' %';
+            }
+        }
+
+        function cambiarTab(num) {
+            document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+                if(idx + 1 === num) {
+                    btn.className = "tab-btn bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap shadow";
+                } else {
+                    btn.className = "tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition";
+                }
+            });
+
+            const secCronometro = document.getElementById('seccion-1');
+            const secExtra = document.getElementById('seccion-contenido-extra');
+            const tituloExtra = document.getElementById('titulo-seccion-activa');
+
+            if(num === 1) {
+                secCronometro.classList.remove('hidden');
+                secExtra.classList.add('hidden');
+            } else {
+                secCronometro.classList.add('hidden');
+                secExtra.classList.remove('hidden');
+                const nombresTabs = ["", "1. Cronómetro", "2. Hojas de Proceso / Ergonomía", "3. Suplementos y Tolerancias", "4. Línea de Balance / Multitarea", "5. Análisis de Costos y Takt Time", "6. Dashboard de Productividad"];
+                tituloExtra.innerText = nombresTabs[num];
+            }
+        }
+
+        // CRONÓMETRO PRINCIPAL DIGITAL (VUELTA A CERO)
+        function toggleCronometro() {
+            const btn = document.getElementById('btn-cron-start');
+            if (!estaCorriendo) {
+                estaCorriendo = true;
+                btn.innerText = "⏸ Pausar";
+                btn.className = "flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition";
+                
+                tiempoInicioElemento = Date.now() - acumuladoPausaElemento;
+                timerInterval = setInterval(() => {
+                    let transcurridoElemento = Date.now() - tiempoInicioElemento;
+                    document.getElementById('display-cronometro').innerText = formatearTiempo(transcurridoElemento);
+                    
+                    let acumuladoVisual = tiempoAcumuladoGeneralMs + transcurridoElemento;
+                    document.getElementById('txt-acumulado').innerText = formatearTiempo(acumuladoVisual);
+                }, 10);
+            } else {
+                pausarCronometro();
+            }
+        }
+
+        function pausarCronometro() {
+            if (!estaCorriendo) return;
+            estaCorriendo = false;
+            clearInterval(timerInterval);
+            acumuladoPausaElemento = Date.now() - tiempoInicioElemento;
+            const btn = document.getElementById('btn-cron-start');
+            btn.innerText = "▶ Reanudar";
+            btn.className = "flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition";
+        }
+
+        function resetCronometro() {
+            pausarCronometro();
+            acumuladoPausaElemento = 0;
+            tiempoInicioElemento = 0;
+            tiempoAcumuladoGeneralMs = 0;
+            contadorTomasTotales = 0;
+            document.getElementById('display-cronometro').innerText = "00:00.00";
+            document.getElementById('txt-acumulado').innerText = "00:00.00";
+            document.getElementById('txt-lap').innerText = "00:00.00";
+            document.getElementById('txt-tomas').innerText = "Tomas: 0";
+            const btn = document.getElementById('btn-cron-start');
+            btn.innerText = "▶ Iniciar / Parar";
+        }
+
+        function registrarLap() {
+            let tiempoObservadoMs = estaCorriendo ? (Date.now() - tiempoInicioElemento) : acumuladoPausaElemento;
+            if (tiempoObservadoMs === 0) return;
+
+            let tiempoSeg = parseFloat((tiempoObservadoMs / 1000).toFixed(2));
+            contadorTomasTotales++;
+            tiempoAcumuladoGeneralMs += tiempoObservadoMs;
+
+            let indexSel = document.getElementById('select-elemento').value;
+            if(elementosEstudio[indexSel]) {
+                // Guarda la toma en el historial del elemento actual para calcular el promedio
+                elementosEstudio[indexSel].tomas.push(tiempoSeg);
+                renderizarTablaElementos();
+                recalcularTotales();
+                
+                // Salto automático al siguiente elemento de la lista
+                let siguienteIndex = (parseInt(indexSel) + 1) % elementosEstudio.length;
+                document.getElementById('select-elemento').value = siguienteIndex;
+                actualizarSeleccionActiva();
+            }
+
+            document.getElementById('txt-lap').innerText = formatearTiempo(tiempoObservadoMs);
+            document.getElementById('txt-acumulado').innerText = formatearTiempo(tiempoAcumuladoGeneralMs);
+            document.getElementById('txt-tomas').innerText = "Tomas: " + contadorTomasTotales;
+
+            // Vuelta a cero del cronómetro elemental sin frenar el flujo
+            acumuladoPausaElemento = 0;
+            tiempoInicioElemento = Date.now();
+            document.getElementById('display-cronometro').innerText = "00:00.00";
+        }
+
+        function formatearTiempo(ms) {
+            let min = Math.floor(ms / 60000);
+            let seg = Math.floor((ms % 60000) / 1000);
+            let cent = Math.floor((ms % 1000) / 10);
+            return (min < 10 ? "0" : "") + min + ":" + 
+                   (seg < 10 ? "0" : "") + seg + "." + 
+                   (cent < 10 ? "0" : "") + cent;
+        }
+
+        function descargarExcelNativo() {
+            if (typeof XLSX === 'undefined') {
+                alert('La librería de Excel se está cargando. Intente de nuevo.');
+                return;
+            }
+
+            let estudioVal = document.getElementById('input-estudio').value;
+            let operarioVal = document.getElementById('input-operario').value;
+            let taktVal = document.getElementById('input-takt').value;
+
+            let wb = XLSX.utils.book_new();
+            
+            let datos = [
+                ["IE-Pro v3.6.3 - Reporte de Estudio de Tiempos"],
+                ["Estudio:", estudioVal],
+                ["Operario:", operarioVal],
+                ["Takt Time:", taktVal],
+                [""],
+                ["# / Elemento", "Tipo", "N (Tomas)", "To Promedio (s)", "Ritmo (%)", "Tb (s)", "Historial Tomas (s)"]
+            ];
+
+            elementosEstudio.forEach(el => {
+                let promedioTo = calcularPromedio(el.tomas);
+                let tb = (promedioTo * el.ritmo) / 100;
+                datos.push([el.nombre, el.tipo, el.tomas.length, promedioTo.toFixed(2), el.ritmo, tb.toFixed(2), el.tomas.join(", ")]);
+            });
+
+            let ws = XLSX.utils.aoa_to_sheet(datos);
+            XLSX.utils.book_append_sheet(wb, ws, "Desglose de Elementos");
+            XLSX.writeFile(wb, "Estudio_" + estudioVal.replace(/\s+/g, '_') + ".xlsx");
+        }
+
+        function exportarJSON() {
+            let datosEstudio = {
+                estudio: document.getElementById('input-estudio').value,
+                operario: document.getElementById('input-operario').value,
+                taktTime: document.getElementById('input-takt').value,
+                elementos: elementosEstudio
+            };
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosEstudio, null, 2));
+            let a = document.createElement('a');
+            a.href = dataStr;
+            a.download = "IE_Pro_Respaldo_Estudio.json";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
