@@ -216,7 +216,7 @@
 
     </div>
 
-    <!-- Script Robusto Sincronizado con DOMContentLoaded -->
+    <!-- Script con Lógica de Cronometraje Continuo (Sin Reset de Acumulado) -->
     <script>
         // Variables Cronómetro Principal
         let timerInterval = null;
@@ -224,6 +224,7 @@
         let tiempoAcumuladoPausa = 0;
         let estaCorriendo = false;
         let contadorTomas = 0;
+        let ultimoTiempoLapMs = 0;
 
         // Variables Cronómetro Ciclo Total
         let cicloInterval = null;
@@ -244,12 +245,12 @@
             renderizarTablaElementos();
             recalcularTotales();
 
-            // Enlazar Eventos Cronómetro Principal
+            // Eventos Cronómetro Principal
             document.getElementById('btn-cron-start').addEventListener('click', toggleCronometro);
             document.getElementById('btn-cron-lap').addEventListener('click', registrarLap);
             document.getElementById('btn-cron-reset').addEventListener('click', resetCronometro);
 
-            // Enlazar Eventos Cronómetro Ciclo Total
+            // Eventos Cronómetro Ciclo Total
             document.getElementById('btn-ciclo-start').addEventListener('click', toggleCronometroCiclo);
             document.getElementById('btn-ciclo-reset').addEventListener('click', resetCronometroCiclo);
             document.getElementById('btn-top-ciclo').addEventListener('click', toggleCronometroCiclo);
@@ -375,193 +376,4 @@
                 
                 cicloInicio = Date.now() - cicloAcumuladoPausa;
                 cicloInterval = setInterval(() => {
-                    let transcurrido = Date.now() - cicloInicio;
-                    document.getElementById('txt-ciclo-total').innerText = (transcurrido / 1000).toFixed(2);
-                }, 10);
-            } else {
-                pausarCronometroCiclo();
-            }
-        }
-
-        function pausarCronometroCiclo() {
-            if (!estaCorriendoCiclo) return;
-            estaCorriendoCiclo = false;
-            clearInterval(cicloInterval);
-            cicloAcumuladoPausa = Date.now() - cicloInicio;
-            const btn = document.getElementById('btn-ciclo-start');
-            btn.innerText = "▶ Reanudar";
-            btn.className = "bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg shadow transition";
-        }
-
-        function resetCronometroCiclo() {
-            pausarCronometroCiclo();
-            cicloAcumuladoPausa = 0;
-            cicloInicio = 0;
-            const btn = document.getElementById('btn-ciclo-start');
-            btn.innerText = "▶ Iniciar";
-            recalcularTotales();
-        }
-
-        function actualizarRitmo(val) {
-            document.getElementById('ritmo-val').innerText = val + ' %';
-            let indexSel = document.getElementById('select-elemento').value;
-            if(elementosEstudio[indexSel]) {
-                elementosEstudio[indexSel].ritmo = parseInt(val);
-                renderizarTablaElementos();
-                recalcularTotales();
-            }
-        }
-
-        function actualizarSeleccionActiva() {
-            let indexSel = document.getElementById('select-elemento').value;
-            if(elementosEstudio[indexSel]) {
-                document.getElementById('range-ritmo').value = elementosEstudio[indexSel].ritmo;
-                document.getElementById('ritmo-val').innerText = elementosEstudio[indexSel].ritmo + ' %';
-            }
-        }
-
-        function cambiarTab(num) {
-            document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
-                if(idx + 1 === num) {
-                    btn.className = "tab-btn bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap shadow";
-                } else {
-                    btn.className = "tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition";
-                }
-            });
-
-            const secCronometro = document.getElementById('seccion-1');
-            const secExtra = document.getElementById('seccion-contenido-extra');
-            const tituloExtra = document.getElementById('titulo-seccion-activa');
-
-            if(num === 1) {
-                secCronometro.classList.remove('hidden');
-                secExtra.classList.add('hidden');
-            } else {
-                secCronometro.classList.add('hidden');
-                secExtra.classList.remove('hidden');
-                const nombresTabs = ["", "1. Cronómetro", "2. Hojas de Proceso / Ergonomía", "3. Suplementos y Tolerancias", "4. Línea de Balance / Multitarea", "5. Análisis de Costos y Takt Time", "6. Dashboard de Productividad"];
-                tituloExtra.innerText = nombresTabs[num];
-            }
-        }
-
-        // CRONÓMETRO PRINCIPAL DIGITAL
-        function toggleCronometro() {
-            const btn = document.getElementById('btn-cron-start');
-            if (!estaCorriendo) {
-                estaCorriendo = true;
-                btn.innerText = "⏸ Pausar";
-                btn.className = "flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition";
-                
-                tiempoInicio = Date.now() - tiempoAcumuladoPausa;
-                timerInterval = setInterval(() => {
-                    let tiempoActual = Date.now() - tiempoInicio;
-                    document.getElementById('display-cronometro').innerText = formatearTiempo(tiempoActual);
-                }, 10);
-            } else {
-                pausarCronometro();
-            }
-        }
-
-        function pausarCronometro() {
-            if (!estaCorriendo) return;
-            estaCorriendo = false;
-            clearInterval(timerInterval);
-            tiempoAcumuladoPausa = Date.now() - tiempoInicio;
-            const btn = document.getElementById('btn-cron-start');
-            btn.innerText = "▶ Reanudar";
-            btn.className = "flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition";
-        }
-
-        function resetCronometro() {
-            pausarCronometro();
-            tiempoAcumuladoPausa = 0;
-            tiempoInicio = 0;
-            document.getElementById('display-cronometro').innerText = "00:00.00";
-            document.getElementById('txt-acumulado').innerText = "00:00.00";
-            document.getElementById('txt-lap').innerText = "00:00.00";
-            const btn = document.getElementById('btn-cron-start');
-            btn.innerText = "▶ Iniciar / Parar";
-        }
-
-        function registrarLap() {
-            let tiempoActualMs = estaCorriendo ? (Date.now() - tiempoInicio) : tiempoAcumuladoPausa;
-            if (tiempoActualMs === 0) return;
-
-            contadorTomas++;
-            let tiempoActualStr = formatearTiempo(tiempoActualMs);
-            let tiempoSeg = parseFloat((tiempoActualMs / 1000).toFixed(2));
-            
-            let indexSel = document.getElementById('select-elemento').value;
-            if(elementosEstudio[indexSel]) {
-                elementosEstudio[indexSel].to = tiempoSeg;
-                elementosEstudio[indexSel].n = contadorTomas;
-                renderizarTablaElementos();
-                recalcularTotales();
-            }
-
-            document.getElementById('txt-lap').innerText = tiempoActualStr;
-            document.getElementById('txt-acumulado').innerText = tiempoActualStr;
-            document.getElementById('txt-tomas').innerText = "Tomas: " + contadorTomas;
-
-            resetCronometro();
-            toggleCronometro();
-        }
-
-        function formatearTiempo(ms) {
-            let min = Math.floor(ms / 60000);
-            let seg = Math.floor((ms % 60000) / 1000);
-            let cent = Math.floor((ms % 1000) / 10);
-            return (min < 10 ? "0" : "") + min + ":" + 
-                   (seg < 10 ? "0" : "") + seg + "." + 
-                   (cent < 10 ? "0" : "") + cent;
-        }
-
-        function descargarExcelNativo() {
-            if (typeof XLSX === 'undefined') {
-                alert('La librería de Excel se está cargando. Intente de nuevo.');
-                return;
-            }
-
-            let estudioVal = document.getElementById('input-estudio').value;
-            let operarioVal = document.getElementById('input-operario').value;
-            let taktVal = document.getElementById('input-takt').value;
-
-            let wb = XLSX.utils.book_new();
-            
-            let datos = [
-                ["IE-Pro v3.6.3 - Reporte de Estudio de Tiempos"],
-                ["Estudio:", estudioVal],
-                ["Operario:", operarioVal],
-                ["Takt Time:", taktVal],
-                [""],
-                ["# / Elemento", "Tipo", "N", "To (s)", "Ritmo (%)", "Tb (s)"]
-            ];
-
-            elementosEstudio.forEach(el => {
-                let tb = (el.to * el.ritmo) / 100;
-                datos.push([el.nombre, el.tipo, el.n, el.to, el.ritmo, tb]);
-            });
-
-            let ws = XLSX.utils.aoa_to_sheet(datos);
-            XLSX.utils.book_append_sheet(wb, ws, "Desglose de Elementos");
-            XLSX.writeFile(wb, "Estudio_" + estudioVal.replace(/\s+/g, '_') + ".xlsx");
-        }
-
-        function exportarJSON() {
-            let datosEstudio = {
-                estudio: document.getElementById('input-estudio').value,
-                operario: document.getElementById('input-operario').value,
-                taktTime: document.getElementById('input-takt').value,
-                elementos: elementosEstudio
-            };
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosEstudio, null, 2));
-            let a = document.createElement('a');
-            a.href = dataStr;
-            a.download = "IE_Pro_Respaldo_Estudio.json";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-    </script>
-</body>
-</html>
+                    let transcurrido = Date.
