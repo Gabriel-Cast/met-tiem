@@ -1,14 +1,14 @@
-<!DOCTYPE html><!-- v3.6.1 -->
+<!DOCTYPE html><!-- v3.6.2 -->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IE-Pro v3.6 - Ingeniería Industrial & Métodos y Tiempos</title>
 
-    <!-- Vinculación del Manifiesto e Ícono de PWA para Celular -->
-    <link rel="manifest" href="./manifest.json">
-    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3652/3652191.png">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3652/3652191.png">
+    <!-- Vinculación del Manifiesto e Ícono de PWA para Celular (Versión Forzada 3.6.2) -->
+    <link rel="manifest" href="./manifest.json?v=362">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://cdn-icons-png.flaticon.com/512/3652/3652191.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="https://cdn-icons-png.flaticon.com/512/3652/3652191.png">
 
     <!-- Meta tags para Pantalla Completa Real -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -44,7 +44,7 @@
                 <div>
                     <div class="flex items-center space-x-2">
                         <h1 class="text-xl font-bold tracking-wide">IE-Pro</h1>
-                        <span class="bg-blue-600/30 text-blue-400 text-xs px-2 py-0.5 rounded border border-blue-500/30 font-semibold">v3.6.1</span>
+                        <span class="bg-blue-600/30 text-blue-400 text-xs px-2 py-0.5 rounded border border-blue-500/30 font-semibold">v3.6.2</span>
                     </div>
                     <p class="text-xs text-gray-400">Ingeniería Industrial & Métodos y Tiempos</p>
                 </div>
@@ -194,7 +194,7 @@
         <!-- SECCIONES EXTRAS -->
         <div id="seccion-contenido-extra" class="hidden app-card p-6 rounded-xl shadow-lg space-y-4 text-center">
             <h2 id="titulo-seccion-activa" class="text-lg font-bold text-amber-400">Módulo en Carga</h2>
-            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura de ingeniería industrial de IE-Pro v3.6.1.</p>
+            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura de ingeniería industrial de IE-Pro v3.6.2.</p>
             <button onclick="cambiarTab(1)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow transition">
                 ← Volver al Cronómetro Principal
             </button>
@@ -384,7 +384,7 @@
             let wb = XLSX.utils.book_new();
             
             let datos = [
-                ["IE-Pro v3.6.1 - Reporte de Estudio de Tiempos y Métodos"],
+                ["IE-Pro v3.6.2 - Reporte de Estudio de Tiempos y Métodos"],
                 ["Estudio:", estudioVal],
                 ["Operario:", operarioVal],
                 ["Takt Time (s):", taktVal],
