@@ -1,139 +1,231 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="mobile-web-app-capable" content="yes">
-  <title>IE-Pro v3.6 - Ingeniería Industrial</title>
-  <style>
-    :root {
-      --vh: 1vh;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body {
-      width: 100vw;
-      height: calc(var(--vh, 1vh) * 100);
-      overflow: hidden;
-      position: fixed;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #0d1117;
-      color: #e6edf3;
-      touch-action: none;
-    }
-
-    #app-container {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    /* Estilos adaptados de tu interfaz IE-Pro */
-    .app-header {
-      background: #161b22;
-      border-bottom: 1px solid #30363d;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .app-logo {
-      background: #1f6feb;
-      color: white;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 0.9rem;
-    }
-
-    .app-title h1 {
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
-
-    .app-title span {
-      font-size: 0.75rem;
-      color: #8b949e;
-    }
-
-    .scrollable-content {
-      flex: 1;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
-      padding: 16px;
-    }
-
-    .card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      padding: 16px;
-      margin-bottom: 12px;
-      border-radius: 12px;
-    }
-
-    .timer-display {
-      font-size: 2.8rem;
-      font-weight: bold;
-      text-align: center;
-      color: #f0883e;
-      font-family: monospace;
-      margin: 16px 0;
-    }
-  </style>
-</head>
-<body>
-
-  <div id="app-container">
-    <header class="app-header">
-      <div class="app-logo">20</div>
-      <div class="app-title">
-        <h1>IE-Pro <span style="background:#388bfd; color:white; padding:2px 6px; border-radius:4px;">v3.6</span></h1>
-        <span>Ingeniería Industrial & Métodos y Tiempos</span>
-      </div>
-    </header>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IE-Pro v3.6 - Ingeniería Industrial & Métodos y Tiempos</title>
+    <!-- Meta tags para PWA y Pantalla Completa Real -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0d1117">
     
-    <div class="scrollable-content">
-      <div class="card">
-        <h3>Cronómetro Digital</h3>
-        <div class="timer-display">00:00.00</div>
-        <p style="text-align:center; color:#8b949e;">Tomas: 12</p>
-      </div>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            touch-action: manipulation;
+        }
+        .app-card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-3 md:p-6">
+    <div class="max-w-7xl mx-auto space-y-4">
+        
+        <!-- Header Principal -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center bg-[#161b22] border border-[#30363d] p-4 rounded-xl gap-4 shadow-lg">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 p-2.5 rounded-lg text-white font-bold text-xl shadow">⏱ 20</div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-xl font-bold tracking-wide">IE-Pro</h1>
+                        <span class="bg-blue-600/30 text-blue-400 text-xs px-2 py-0.5 rounded border border-blue-500/30 font-semibold">v3.6</span>
+                    </div>
+                    <p class="text-xs text-gray-400">Ingeniería Industrial & Métodos y Tiempos</p>
+                </div>
+            </div>
 
-      <div class="card">
-        <h3>Elemento / Operación Activa</h3>
-        <p style="margin-top: 8px; padding: 10px; background: #21262d; border-radius: 6px;">1. Tomar block de motor y fijación</p>
-      </div>
+            <!-- Metadatos de Estudio -->
+            <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                <div class="bg-[#0b0f19] border border-[#30363d] px-3 py-1.5 rounded-lg text-xs flex-1 md:flex-initial">
+                    <span class="text-gray-400 block text-[10px]">Estudio ✎</span>
+                    <span class="font-medium text-gray-200">Ensamble Motor Línea A</span>
+                </div>
+                <div class="bg-[#0b0f19] border border-[#30363d] px-3 py-1.5 rounded-lg text-xs flex-1 md:flex-initial">
+                    <span class="text-gray-400 block text-[10px]">Operario ✎</span>
+                    <span class="font-medium text-gray-200">Juan Pérez (#4021)</span>
+                </div>
+                <div class="bg-[#0b0f19] border border-[#30363d] px-3 py-1.5 rounded-lg text-xs">
+                    <span class="text-gray-400 block text-[10px]">Takt Time →</span>
+                    <span class="font-bold text-amber-400">48.04s</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Barra de Botones de Exportación -->
+        <div class="flex flex-wrap gap-2">
+            <button class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
+                <span>📁</span><span>Abrir Excel / JSON</span>
+            </button>
+            <button class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
+                <span>📥</span><span>Descargar Excel Completo</span>
+            </button>
+            <button class="bg-[#21262d] hover:bg-[#30363d] text-gray-300 border border-[#30363d] text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
+                <span>💾</span><span>Resp. JSON</span>
+            </button>
+        </div>
+
+        <!-- Pestañas de Navegación -->
+        <nav class="flex overflow-x-auto space-x-1 bg-[#161b22] p-1.5 rounded-xl border border-[#30363d] scrollbar-none">
+            <button class="bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap shadow">1. Cronómetro</button>
+            <button class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">2. Hojas/Ergo</button>
+            <button class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">3. Suplementos</button>
+            <button class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">4. Multitarea</button>
+            <button class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">5. Costos/Takt</button>
+            <button class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">6. Dashboard</button>
+        </nav>
+
+        <!-- Contenido Principal: Grid de 2 Columnas -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            
+            <!-- Columna Izquierda: Cronómetro y Elemento Activo -->
+            <div class="lg:col-span-5 space-y-4">
+                
+                <!-- Tarjeta de Cronómetro Digital -->
+                <div class="app-card p-4 rounded-xl shadow-lg space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="bg-[#21262d] border border-[#30363d] text-gray-300 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">CRONÓMETRO DIGITAL</span>
+                        <span class="text-xs text-gray-400">Tomas: 12</span>
+                    </div>
+
+                    <!-- Display de Tiempo Principal -->
+                    <div class="bg-[#0b0f19] border border-[#30363d] py-6 rounded-xl text-center shadow-inner">
+                        <div class="text-4xl md:text-5xl font-mono font-extrabold text-amber-500 tracking-wider">00:00.00</div>
+                    </div>
+
+                    <!-- Acumulado y Último Lap -->
+                    <div class="flex justify-between text-xs text-gray-400 px-1 font-mono">
+                        <div>ACUMULADO: <span class="text-gray-200 font-semibold">00:00.00</span></div>
+                        <div>ÚLTIMO LAP: <span class="text-gray-200 font-semibold">00:00.00</span></div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de Elemento / Operación Activa -->
+                <div class="app-card p-4 rounded-xl shadow-lg space-y-3">
+                    <label class="text-xs font-bold text-gray-300 uppercase tracking-wide">ELEMENTO / OPERACIÓN ACTIVA:</label>
+                    <select class="w-full bg-[#0b0f19] border border-[#30363d] text-gray-200 text-sm rounded-lg p-2.5 focus:outline-none focus:border-blue-500">
+                        <option>1. Tomar block de motor y fijar (Manual)</option>
+                        <option>2. Atornillar culata (Torque)</option>
+                        <option>3. Ciclo de Prueba Automático</option>
+                    </select>
+
+                    <div class="space-y-1.5 pt-1">
+                        <div class="flex justify-between text-xs font-medium text-gray-300">
+                            <span>VALORACIÓN DEL RITMO (OIT %):</span>
+                            <span class="bg-[#0b0f19] border border-[#30363d] px-2 py-0.5 rounded text-amber-400 font-mono">100 %</span>
+                        </div>
+                        <input type="range" min="50" max="150" value="100" class="w-full accent-blue-600 bg-[#0b0f19] rounded-lg h-2 cursor-pointer">
+                        <div class="flex justify-between text-[10px] text-gray-500 font-mono">
+                            <span>60% (Lento)</span>
+                            <span>100% (Normal)</span>
+                            <span>140% (Rápido)</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Columna Derecha: Desglose de Elementos y Tiempos -->
+            <div class="lg:col-span-7 space-y-4">
+                
+                <div class="app-card p-4 rounded-xl shadow-lg space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-lg">📋</span>
+                            <div>
+                                <h2 class="text-sm font-bold text-gray-200">Desglose de Elementos</h2>
+                                <p class="text-[11px] text-gray-400">Tiempos Observados (To), Valoración (R) y Tiempo Básico (Tb)</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <button class="flex-1 sm:flex-initial bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center justify-center space-x-1">
+                                <span>🔄</span><span>Tiempo Ciclo Total</span>
+                            </button>
+                            <button class="flex-1 sm:flex-initial bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center justify-center space-x-1">
+                                <span>+</span><span>Nuevo Elemento</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Resumen de Ciclo Total -->
+                    <div class="bg-[#0b0f19] border border-[#30363d] p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-amber-500 text-lg">⏱</span>
+                            <div>
+                                <span class="text-[10px] text-gray-400 uppercase tracking-wider block">TIEMPO DE CICLO TOTAL OPERACIÓN</span>
+                                <div class="flex items-baseline space-x-1">
+                                    <input type="text" value="23.68" class="bg-[#161b22] border border-[#30363d] text-amber-400 font-mono font-bold text-lg w-20 px-2 py-0.5 rounded text-center">
+                                    <span class="text-xs text-gray-400 font-semibold">s</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right text-xs font-mono">
+                            <span class="text-gray-400 block">Suma Elementos (To)</span>
+                            <span class="text-blue-400 font-bold">23.68 s</span>
+                        </div>
+                        <div class="text-right text-xs font-mono">
+                            <span class="text-gray-400 block">Diferencia / Remanente</span>
+                            <span class="text-emerald-400 font-bold">0.00 s (100.0%)</span>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Elementos -->
+                    <div class="overflow-x-auto border border-[#30363d] rounded-xl">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#0b0f19] text-[11px] text-gray-400 border-b border-[#30363d]">
+                                    <th class="p-2.5 font-semibold"># / ELEMENTO</th>
+                                    <th class="p-2.5 font-semibold">TIPO</th>
+                                    <th class="p-2.5 font-semibold text-center">N</th>
+                                    <th class="p-2.5 font-semibold text-right">TO (S)</th>
+                                    <th class="p-2.5 font-semibold text-center">RITMO (%)</th>
+                                    <th class="p-2.5 font-semibold text-right">TB (S)</th>
+                                    <th class="p-2.5 font-semibold text-center">ACCIÓN</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-xs divide-y divide-[#30363d]">
+                                <tr class="hover:bg-[#1f242c] transition">
+                                    <td class="p-2.5 font-medium text-gray-200">1. Tomar block de motor y fijar</td>
+                                    <td class="p-2.5"><span class="bg-blue-900/40 text-blue-300 border border-blue-700/40 px-1.5 py-0.5 rounded text-[10px]">Manual</span></td>
+                                    <td class="p-2.5 text-center font-mono">4</td>
+                                    <td class="p-2.5 text-right font-mono text-amber-400 font-bold">3.55s</td>
+                                    <td class="p-2.5 text-center"><input type="text" value="100" class="bg-[#0b0f19] border border-[#30363d] text-center w-12 py-0.5 rounded text-xs font-mono"> %</td>
+                                    <td class="p-2.5 text-right font-mono text-gray-200">3.55s</td>
+                                    <td class="p-2.5 text-center"><button class="text-red-400 hover:text-red-300 p-1">🗑</button></td>
+                                </tr>
+                                <tr class="hover:bg-[#1f242c] transition">
+                                    <td class="p-2.5 font-medium text-gray-200">2. Atornillar culata (Torque)</td>
+                                    <td class="p-2.5"><span class="bg-blue-900/40 text-blue-300 border border-blue-700/40 px-1.5 py-0.5 rounded text-[10px]">Manual</span></td>
+                                    <td class="p-2.5 text-center font-mono">4</td>
+                                    <td class="p-2.5 text-right font-mono text-amber-400 font-bold">2.92s</td>
+                                    <td class="p-2.5 text-center"><input type="text" value="100" class="bg-[#0b0f19] border border-[#30363d] text-center w-12 py-0.5 rounded text-xs font-mono"> %</td>
+                                    <td class="p-2.5 text-right font-mono text-gray-200">2.92s</td>
+                                    <td class="p-2.5 text-center"><button class="text-red-400 hover:text-red-300 p-1">🗑</button></td>
+                                </tr>
+                                <tr class="hover:bg-[#1f242c] transition">
+                                    <td class="p-2.5 font-medium text-gray-200">3. Ciclo de Prueba Automático</td>
+                                    <td class="p-2.5"><span class="bg-purple-900/40 text-purple-300 border border-purple-700/40 px-1.5 py-0.5 rounded text-[10px]">Maquina</span></td>
+                                    <td class="p-2.5 text-center font-mono">4</td>
+                                    <td class="p-2.5 text-right font-mono text-amber-400 font-bold">17.20s</td>
+                                    <td class="p-2.5 text-center"><input type="text" value="100" class="bg-[#0b0f19] border border-[#30363d] text-center w-12 py-0.5 rounded text-xs font-mono"> %</td>
+                                    <td class="p-2.5 text-right font-mono text-gray-200">17.20s</td>
+                                    <td class="p-2.5 text-center"><button class="text-red-400 hover:text-red-300 p-1">🗑</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
     </div>
-  </div>
-
-  <script>
-    // Ajuste dinámico de altura para celulares (elimina barras flotantes)
-    const setDynamicHeight = () => {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
-    };
-    window.addEventListener('resize', setDynamicHeight);
-    window.addEventListener('orientationchange', setDynamicHeight);
-    setDynamicHeight();
-
-    // Previene el rebote elástico de la pantalla completa
-    document.body.addEventListener('touchmove', (e) => {
-      if (!e.target.closest('.scrollable-content')) {
-        e.preventDefault();
-      }
-    }, { passive: false });
-  </script>
-
 </body>
 </html>
