@@ -216,7 +216,7 @@
 
     </div>
 
-    <!-- Script con Estructura de Tomas Fijas -->
+    <!-- Script con Manejo Dual de Eventos Táctiles (Mobile-Friendly) -->
     <script>
         let timerInterval = null;
         let tiempoInicioElemento = 0;
@@ -238,24 +238,38 @@
             { id: 5, nombre: "5. 9. Colocación de insertos", tipo: "Manual", tomas: [], ritmo: 100 }
         ];
 
+        // Función auxiliar para registrar eventos sin bloqueos táctiles
+        function vincularBoton(id, callback) {
+            let elemento = document.getElementById(id);
+            if (!elemento) return;
+            elemento.addEventListener('click', function(e) {
+                e.preventDefault();
+                callback();
+            });
+            elemento.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                callback();
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             actualizarSelectElementos();
             renderizarTablaElementos();
             recalcularTotales();
 
-            document.getElementById('btn-cron-start').addEventListener('click', toggleCronometro);
-            document.getElementById('btn-cron-lap').addEventListener('click', registrarLap);
-            document.getElementById('btn-cron-reset').addEventListener('click', resetCronometro);
+            vincularBoton('btn-cron-start', toggleCronometro);
+            vincularBoton('btn-cron-lap', registrarLap);
+            vincularBoton('btn-cron-reset', resetCronometro);
 
-            document.getElementById('btn-ciclo-start').addEventListener('click', toggleCronometroCiclo);
-            document.getElementById('btn-ciclo-reset').addEventListener('click', resetCronometroCiclo);
-            document.getElementById('btn-top-ciclo').addEventListener('click', toggleCronometroCiclo);
-            document.getElementById('icon-ciclo').addEventListener('click', toggleCronometroCiclo);
+            vincularBoton('btn-ciclo-start', toggleCronometroCiclo);
+            vincularBoton('btn-ciclo-reset', resetCronometroCiclo);
+            vincularBoton('btn-top-ciclo', toggleCronometroCiclo);
+            vincularBoton('icon-ciclo', toggleCronometroCiclo);
 
-            document.getElementById('btn-nuevo-elem').addEventListener('click', abrirModalNuevoElemento);
-            document.getElementById('btn-export-excel').addEventListener('click', descargarExcelNativo);
-            document.getElementById('btn-export-json').addEventListener('click', exportarJSON);
-            document.getElementById('btn-volver-main').addEventListener('click', () => cambiarTab(1));
+            vincularBoton('btn-nuevo-elem', abrirModalNuevoElemento);
+            vincularBoton('btn-export-excel', descargarExcelNativo);
+            vincularBoton('btn-export-json', exportarJSON);
+            vincularBoton('btn-volver-main', () => cambiarTab(1));
 
             document.getElementById('input-takt').addEventListener('input', recalcularTotales);
             document.getElementById('select-elemento').addEventListener('change', actualizarSeleccionActiva);
@@ -264,9 +278,9 @@
             });
 
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    cambiarTab(parseInt(this.getAttribute('data-tab')));
-                });
+                let tabNum = parseInt(btn.getAttribute('data-tab'));
+                btn.addEventListener('click', (e) => { e.preventDefault(); cambiarTab(tabNum); });
+                btn.addEventListener('touchend', (e) => { e.preventDefault(); cambiarTab(tabNum); });
             });
         });
 
@@ -315,13 +329,13 @@
             });
         }
 
-        function cambiarRitmoElemento(index, nuevoRitmo) {
+        window.cambiarRitmoElemento = function(index, nuevoRitmo) {
             elementosEstudio[index].ritmo = parseFloat(nuevoRitmo) || 100;
             renderizarTablaElementos();
             recalcularTotales();
         }
 
-        function eliminarElemento(index) {
+        window.eliminarElemento = function(index) {
             elementosEstudio.splice(index, 1);
             actualizarSelectElementos();
             renderizarTablaElementos();
@@ -529,7 +543,6 @@
                    (cent < 10 ? "0" : "") + cent;
         }
 
-        // DESCARGA DE EXCEL CON MATRIZ FIJA DE HASTA 10 COLUMNAS DE TOMAS
         function descargarExcelNativo() {
             if (typeof XLSX === 'undefined') {
                 alert('La librería de Excel se está cargando. Intente de nuevo.');
@@ -567,7 +580,6 @@
             let wsResumen = XLSX.utils.aoa_to_sheet(datosResumen);
             XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen del Estudio");
 
-            // Matriz fija garantizando columnas estables (ej. 10 tomas fijas)
             let totalTomasFijas = 10;
             let encabezadoMatriz = ["# / Elemento", "Tipo", "Ritmo (%)"];
             for (let i = 1; i <= totalTomasFijas; i++) {
@@ -583,39 +595,3 @@
             ];
 
             elementosEstudio.forEach(el => {
-                let filaMatriz = [el.nombre, el.tipo, el.ritmo];
-                for (let i = 0; i < totalTomasFijas; i++) {
-                    if (i < el.tomas.length) {
-                        filaMatriz.push(el.tomas[i]);
-                    } else {
-                        filaMatriz.push(""); // Celda limpia fija
-                    }
-                }
-                filaMatriz.push(parseFloat(calcularPromedio(el.tomas).toFixed(2)));
-                datosMatriz.push(filaMatriz);
-            });
-
-            let wsMatriz = XLSX.utils.aoa_to_sheet(datosMatriz);
-            XLSX.utils.book_append_sheet(wb, wsMatriz, "Matriz de Tomas");
-
-            XLSX.writeFile(wb, "Estudio_Tiempos_" + estudioVal.replace(/\s+/g, '_') + ".xlsx");
-        }
-
-        function exportarJSON() {
-            let datosEstudio = {
-                estudio: document.getElementById('input-estudio').value,
-                operario: document.getElementById('input-operario').value,
-                taktTime: document.getElementById('input-takt').value,
-                elementos: elementosEstudio
-            };
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosEstudio, null, 2));
-            let a = document.createElement('a');
-            a.href = dataStr;
-            a.download = "IE_Pro_Respaldo_Estudio.json";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-    </script>
-</body>
-</html>
