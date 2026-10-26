@@ -141,7 +141,7 @@
                             <h2 class="text-sm font-bold text-gray-200 flex items-center space-x-1.5">
                                 <span>📋</span><span>Desglose de Elementos</span>
                             </h2>
-                            <p class="text-[11px] text-gray-400">Tiempos Observados (To), Valoración (R) y Promedio</p>
+                            <p class="text-[11px] text-gray-400">Tiempos Observados (To), Valoración (R) y Promedio Fijo</p>
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
                             <button id="btn-top-ciclo" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg shadow transition flex items-center space-x-1">
@@ -216,7 +216,7 @@
 
     </div>
 
-    <!-- Script con Registro 100% Sensible a Cada Toque -->
+    <!-- Script con Estructura de Tomas Fijas -->
     <script>
         let timerInterval = null;
         let tiempoInicioElemento = 0;
@@ -257,7 +257,7 @@
             document.getElementById('btn-export-json').addEventListener('click', exportarJSON);
             document.getElementById('btn-volver-main').addEventListener('click', () => cambiarTab(1));
 
-            document.getElementById('input-takt').addEventListener('input', recalcalcularTotales);
+            document.getElementById('input-takt').addEventListener('input', recalcularTotales);
             document.getElementById('select-elemento').addEventListener('change', actualizarSeleccionActiva);
             document.getElementById('range-ritmo').addEventListener('input', function(e) {
                 actualizarRitmo(e.target.value);
@@ -491,11 +491,10 @@
             btn.innerText = "▶ Iniciar / Parar";
         }
 
-        // REGISTRO INMEDIATO DE TOMA (SIN BLOQUEOS)
         function registrarLap() {
             let ahora = Date.now();
             let tiempoObservadoMs = estaCorriendo ? (ahora - tiempoInicioElemento) : acumuladoPausaElemento;
-            if (tiempoObservadoMs < 50) return; // Solo protege contra falsos clics de 0 milisegundos
+            if (tiempoObservadoMs < 50) return;
 
             let tiempoSeg = parseFloat((tiempoObservadoMs / 1000).toFixed(2));
             contadorTomasTotales++;
@@ -512,4 +511,111 @@
                 actualizarSeleccionActiva();
             }
 
-            document.getElementById('txt-lap').innerText = formatear
+            document.getElementById('txt-lap').innerText = formatearTiempo(tiempoObservadoMs);
+            document.getElementById('txt-acumulado').innerText = formatearTiempo(tiempoAcumuladoGeneralMs);
+            document.getElementById('txt-tomas').innerText = "Tomas: " + contadorTomasTotales;
+
+            acumuladoPausaElemento = 0;
+            tiempoInicioElemento = Date.now();
+            document.getElementById('display-cronometro').innerText = "00:00.00";
+        }
+
+        function formatearTiempo(ms) {
+            let min = Math.floor(ms / 60000);
+            let seg = Math.floor((ms % 60000) / 1000);
+            let cent = Math.floor((ms % 1000) / 10);
+            return (min < 10 ? "0" : "") + min + ":" + 
+                   (seg < 10 ? "0" : "") + seg + "." + 
+                   (cent < 10 ? "0" : "") + cent;
+        }
+
+        // DESCARGA DE EXCEL CON MATRIZ FIJA DE HASTA 10 COLUMNAS DE TOMAS
+        function descargarExcelNativo() {
+            if (typeof XLSX === 'undefined') {
+                alert('La librería de Excel se está cargando. Intente de nuevo.');
+                return;
+            }
+
+            let estudioVal = document.getElementById('input-estudio').value;
+            let operarioVal = document.getElementById('input-operario').value;
+            let taktVal = document.getElementById('input-takt').value;
+
+            let wb = XLSX.utils.book_new();
+            
+            let datosResumen = [
+                ["IE-Pro v3.6.3 - Reporte de Estudio de Tiempos"],
+                ["Estudio:", estudioVal],
+                ["Operario:", operarioVal],
+                ["Takt Time (s):", taktVal],
+                [""],
+                ["# / Elemento", "Tipo", "N° Tomas", "To Promedio (s)", "Ritmo (%)", "Tb Básico (s)"]
+            ];
+
+            elementosEstudio.forEach(el => {
+                let promedioTo = calcularPromedio(el.tomas);
+                let tb = (promedioTo * el.ritmo) / 100;
+                datosResumen.push([
+                    el.nombre, 
+                    el.tipo, 
+                    el.tomas.length, 
+                    parseFloat(promedioTo.toFixed(2)), 
+                    el.ritmo, 
+                    parseFloat(tb.toFixed(2))
+                ]);
+            });
+
+            let wsResumen = XLSX.utils.aoa_to_sheet(datosResumen);
+            XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen del Estudio");
+
+            // Matriz fija garantizando columnas estables (ej. 10 tomas fijas)
+            let totalTomasFijas = 10;
+            let encabezadoMatriz = ["# / Elemento", "Tipo", "Ritmo (%)"];
+            for (let i = 1; i <= totalTomasFijas; i++) {
+                encabezadoMatriz.push("Toma " + i + " (s)");
+            }
+            encabezadoMatriz.push("To Promedio (s)");
+
+            let datosMatriz = [
+                ["MATRIZ FIJA DE REGISTRO DE TOMAS DE TIEMPO"],
+                ["Estudio:", estudioVal],
+                [""],
+                encabezadoMatriz
+            ];
+
+            elementosEstudio.forEach(el => {
+                let filaMatriz = [el.nombre, el.tipo, el.ritmo];
+                for (let i = 0; i < totalTomasFijas; i++) {
+                    if (i < el.tomas.length) {
+                        filaMatriz.push(el.tomas[i]);
+                    } else {
+                        filaMatriz.push(""); // Celda limpia fija
+                    }
+                }
+                filaMatriz.push(parseFloat(calcularPromedio(el.tomas).toFixed(2)));
+                datosMatriz.push(filaMatriz);
+            });
+
+            let wsMatriz = XLSX.utils.aoa_to_sheet(datosMatriz);
+            XLSX.utils.book_append_sheet(wb, wsMatriz, "Matriz de Tomas");
+
+            XLSX.writeFile(wb, "Estudio_Tiempos_" + estudioVal.replace(/\s+/g, '_') + ".xlsx");
+        }
+
+        function exportarJSON() {
+            let datosEstudio = {
+                estudio: document.getElementById('input-estudio').value,
+                operario: document.getElementById('input-operario').value,
+                taktTime: document.getElementById('input-takt').value,
+                elementos: elementosEstudio
+            };
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosEstudio, null, 2));
+            let a = document.createElement('a');
+            a.href = dataStr;
+            a.download = "IE_Pro_Respaldo_Estudio.json";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
