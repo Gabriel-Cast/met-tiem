@@ -132,7 +132,7 @@
 
             </div>
 
-            <!-- Columna Derecha: Desglose de Elementos e Indicador de Ciclo Total -->
+            <!-- Columna Derecha: Desglose de Elementos e Indicador de Ciclo Total Con Cronómetro -->
             <div class="lg:col-span-7 space-y-4">
                 <div class="app-card p-4 rounded-xl shadow-lg space-y-4">
                     
@@ -144,7 +144,7 @@
                             <p class="text-[11px] text-gray-400">Tiempos Observados (To), Valoración (R) y Tiempo Básico (Tb)</p>
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
-                            <button class="bg-amber-600 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg shadow flex items-center space-x-1">
+                            <button onclick="toggleCronometroCiclo()" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg shadow transition flex items-center space-x-1">
                                 <span>⏱</span><span>Tiempo Ciclo Total</span>
                             </button>
                             <button onclick="abrirModalNuevoElemento()" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg shadow transition">
@@ -153,16 +153,29 @@
                         </div>
                     </div>
 
-                    <!-- Tarjeta Idéntica a la Imagen con el Cronómetro de Ciclo Total Operación -->
+                    <!-- TARJETA CON CRONÓMETRO DE TIEMPO DE CICLO TOTAL EN VIVO -->
                     <div class="bg-[#0b0f19] border border-[#30363d] p-3.5 rounded-xl space-y-2">
-                        <div class="flex items-center space-x-3">
-                            <div class="bg-amber-500/20 text-amber-400 p-2 rounded-lg text-sm">⏱</div>
-                            <div>
-                                <span class="text-[10px] text-gray-400 uppercase tracking-wider block">TIEMPO DE CICLO TOTAL OPERACIÓN</span>
-                                <div class="text-2xl font-mono font-extrabold text-amber-400 tracking-wide" id="txt-ciclo-total">15.00 s</div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <button onclick="toggleCronometroCiclo()" id="btn-icon-ciclo" class="bg-amber-500/20 hover:bg-amber-500/40 text-amber-400 p-2.5 rounded-lg text-lg transition shadow">⏱</button>
+                                <div>
+                                    <span class="text-[10px] text-gray-400 uppercase tracking-wider block">TIEMPO DE CICLO TOTAL OPERACIÓN</span>
+                                    <div class="text-2xl font-mono font-extrabold text-amber-400 tracking-wide flex items-center gap-1">
+                                        <span id="txt-ciclo-total">15.00</span>
+                                        <span class="text-sm font-normal text-amber-500">s</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="toggleCronometroCiclo()" id="btn-toggle-ciclo" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg shadow transition">
+                                    ▶ Iniciar
+                                </button>
+                                <button onclick="resetCronometroCiclo()" class="bg-[#21262d] hover:bg-red-900/50 text-gray-300 border border-[#30363d] text-xs p-1.5 rounded-lg shadow transition">
+                                    🔄
+                                </button>
                             </div>
                         </div>
-                        <div class="flex flex-col sm:flex-row justify-between text-[11px] text-gray-400 border-t border-[#30363d] pt-2 font-mono">
+                        <div class="flex flex-col sm:flex-row justify-between text-[11px] text-gray-400 border-t border-[#30363d] pt-2 font-mono w-full">
                             <div>Suma Elementos (To): <span id="txt-suma-to" class="text-blue-400 font-semibold">15.00 s</span></div>
                             <div id="txt-remanente" class="text-amber-300 font-semibold">+33.04 s lib. (31.2% medido)</div>
                         </div>
@@ -203,13 +216,20 @@
 
     </div>
 
-    <!-- Script con la Lógica de Cálculo Exacta -->
+    <!-- Script con los dos cronómetros integrados -->
     <script>
+        // Cronómetro Principal
         let timerInterval = null;
         let tiempoInicio = 0;
         let tiempoAcumuladoPausa = 0;
         let estaCorriendo = false;
         let contadorTomas = 0;
+
+        // Cronómetro de Ciclo Total Operación
+        let cicloInterval = null;
+        let cicloInicio = 0;
+        let cicloAcumuladoPausa = 0;
+        let estaCorriendoCiclo = false;
 
         let elementosEstudio = [
             { id: 1, nombre: "1. 4. 1- Alineación de conformadores", tipo: "Manual", to: 3.00, ritmo: 100, n: 1 },
@@ -299,7 +319,9 @@
                 sumaTo += el.to;
             });
 
-            document.getElementById('txt-ciclo-total').innerText = sumaTo.toFixed(2) + " s";
+            if(!estaCorriendoCiclo && cicloAcumuladoPausa === 0) {
+                document.getElementById('txt-ciclo-total').innerText = sumaTo.toFixed(2);
+            }
             document.getElementById('txt-suma-to').innerText = sumaTo.toFixed(2) + " s";
 
             let taktInput = document.getElementById('input-takt').value.replace('s', '').trim();
@@ -312,6 +334,43 @@
                 : `${diferencia.toFixed(2)} s sobre Takt`;
             
             document.getElementById('txt-remanente').innerText = textoRemanente;
+        }
+
+        // LÓGICA DEL CRONÓMETRO DE CICLO TOTAL
+        function toggleCronometroCiclo() {
+            const btn = document.getElementById('btn-toggle-ciclo');
+            if (!estaCorriendoCiclo) {
+                estaCorriendoCiclo = true;
+                btn.innerText = "⏸ Pausar";
+                btn.className = "bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg shadow transition";
+                
+                cicloInicio = Date.now() - cicloAcumuladoPausa;
+                cicloInterval = setInterval(() => {
+                    let transcurrido = Date.now() - cicloInicio;
+                    document.getElementById('txt-ciclo-total').innerText = (transcurrido / 1000).toFixed(2);
+                }, 10);
+            } else {
+                pausarCronometroCiclo();
+            }
+        }
+
+        function pausarCronometroCiclo() {
+            if (!estaCorriendoCiclo) return;
+            estaCorriendoCiclo = false;
+            clearInterval(cicloInterval);
+            cicloAcumuladoPausa = Date.now() - cicloInicio;
+            const btn = document.getElementById('btn-toggle-ciclo');
+            btn.innerText = "▶ Reanudar";
+            btn.className = "bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg shadow transition";
+        }
+
+        function resetCronometroCiclo() {
+            pausarCronometroCiclo();
+            cicloAcumuladoPausa = 0;
+            cicloInicio = 0;
+            const btn = document.getElementById('btn-toggle-ciclo');
+            btn.innerText = "▶ Iniciar";
+            recalcularTotales();
         }
 
         function actualizarRitmo(val) {
@@ -357,6 +416,7 @@
             }
         }
 
+        // Lógica del Cronómetro Principal de Laps
         function toggleCronometro() {
             const btn = document.getElementById('btn-iniciar');
             if (!estaCorriendo) {
@@ -384,96 +444,4 @@
             btn.className = "flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition";
         }
 
-        function resetCronometro() {
-            pausarCronometro();
-            tiempoAcumuladoPausa = 0;
-            tiempoInicio = 0;
-            document.getElementById('display-cronometro').innerText = "00:00.00";
-            document.getElementById('txt-acumulado').innerText = "00:00.00";
-            document.getElementById('txt-lap').innerText = "00:00.00";
-            const btn = document.getElementById('btn-iniciar');
-            btn.innerText = "▶ Iniciar / Parar";
-        }
-
-        function registrarLap() {
-            let tiempoActualMs = estaCorriendo ? (Date.now() - tiempoInicio) : tiempoAcumuladoPausa;
-            if (tiempoActualMs === 0) return;
-
-            contadorTomas++;
-            let tiempoActualStr = formatearTiempo(tiempoActualMs);
-            let tiempoSeg = parseFloat((tiempoActualMs / 1000).toFixed(2));
-            
-            let indexSel = document.getElementById('select-elemento').value;
-            if(elementosEstudio[indexSel]) {
-                elementosEstudio[indexSel].to = tiempoSeg;
-                elementosEstudio[indexSel].n = contadorTomas;
-                renderizarTablaElementos();
-                recalcularTotales();
-            }
-
-            document.getElementById('txt-lap').innerText = tiempoActualStr;
-            document.getElementById('txt-acumulado').innerText = tiempoActualStr;
-            document.getElementById('txt-tomas').innerText = "Tomas: " + contadorTomas;
-
-            resetCronometro();
-            toggleCronometro();
-        }
-
-        function formatearTiempo(ms) {
-            let min = Math.floor(ms / 60000);
-            let seg = Math.floor((ms % 60000) / 1000);
-            let cent = Math.floor((ms % 1000) / 10);
-            return (min < 10 ? "0" : "") + min + ":" + 
-                   (seg < 10 ? "0" : "") + seg + "." + 
-                   (cent < 10 ? "0" : "") + cent;
-        }
-
-        function descargarExcelNativo() {
-            if (typeof XLSX === 'undefined') {
-                alert('La librería de Excel se está cargando. Intente de nuevo.');
-                return;
-            }
-
-            let estudioVal = document.getElementById('input-estudio').value;
-            let operarioVal = document.getElementById('input-operario').value;
-            let taktVal = document.getElementById('input-takt').value;
-
-            let wb = XLSX.utils.book_new();
-            
-            let datos = [
-                ["IE-Pro v3.6.3 - Reporte de Estudio de Tiempos"],
-                ["Estudio:", estudioVal],
-                ["Operario:", operarioVal],
-                ["Takt Time:", taktVal],
-                [""],
-                ["# / Elemento", "Tipo", "N", "To (s)", "Ritmo (%)", "Tb (s)"]
-            ];
-
-            elementosEstudio.forEach(el => {
-                let tb = (el.to * el.ritmo) / 100;
-                datos.push([el.nombre, el.tipo, el.n, el.to, el.ritmo, tb]);
-            });
-
-            let ws = XLSX.utils.aoa_to_sheet(datos);
-            XLSX.utils.book_append_sheet(wb, ws, "Desglose de Elementos");
-            XLSX.writeFile(wb, "Estudio_" + estudioVal.replace(/\s+/g, '_') + ".xlsx");
-        }
-
-        function exportarJSON() {
-            let datosEstudio = {
-                estudio: document.getElementById('input-estudio').value,
-                operario: document.getElementById('input-operario').value,
-                taktTime: document.getElementById('input-takt').value,
-                elementos: elementosEstudio
-            };
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosEstudio, null, 2));
-            let a = document.createElement('a');
-            a.href = dataStr;
-            a.download = "IE_Pro_Respaldo_Estudio.json";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-    </script>
-</body>
-</html>
+        function resetCronometro
