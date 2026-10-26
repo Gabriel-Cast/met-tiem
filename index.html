@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IE-Pro v3.6 - Ingeniería Industrial & Métodos y Tiempos</title>
 
-    <!-- Vinculación del Manifiesto e Ícono de PWA para Celular (Versión Forzada 3.6.2) -->
+    <!-- Vinculación del Manifiesto e Ícono Personalizado para Celular -->
     <link rel="manifest" href="./manifest.json?v=362">
-    <link rel="icon" type="image/png" sizes="512x512" href="https://cdn-icons-png.flaticon.com/512/3652/3652191.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="https://cdn-icons-png.flaticon.com/512/3652/3652191.png">
+    <link rel="icon" type="image/jpeg" sizes="512x512" href="./icono-app.jpg">
+    <link rel="apple-touch-icon" sizes="512x512" href="./icono-app.jpg">
 
     <!-- Meta tags para Pantalla Completa Real -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -322,106 +322,4 @@
             let tiempoActualStr = formatearTiempo(milisegundos);
             let elementoSel = document.getElementById('select-elemento').value;
             let ritmoVal = document.getElementById('range-ritmo').value + "%";
-            let tiempoSeg = (milisegundos / 1000).toFixed(2);
-
-            listaTomas.push({
-                toma: contadorTomas,
-                elemento: elementoSel,
-                ritmo: ritmoVal,
-                tiempo: tiempoSeg
-            });
-
-            document.getElementById('txt-lap').innerText = tiempoActualStr;
-            document.getElementById('txt-acumulado').innerText = tiempoActualStr;
-            document.getElementById('txt-tomas').innerText = "Tomas: " + contadorTomas;
-
-            let cuerpo = document.getElementById('cuerpo-tabla');
-            if (contadorTomas === 1) cuerpo.innerHTML = "";
-
-            let fila = document.createElement('tr');
-            fila.className = "hover:bg-[#1f242c] transition";
-            fila.innerHTML = `
-                <td class="p-2.5 text-center font-mono">${contadorTomas}</td>
-                <td class="p-2.5 font-medium text-gray-200">${elementoSel}</td>
-                <td class="p-2.5 text-center font-mono">${ritmoVal}</td>
-                <td class="p-2.5 text-right font-mono text-amber-400 font-bold">${tiempoSeg}s</td>
-            `;
-            cuerpo.appendChild(fila);
-
-            milisegundos = 0;
-            document.getElementById('display-cronometro').innerText = "00:00.00";
-        }
-
-        function limpiarTomas() {
-            if(confirm('¿Desea limpiar todas las tomas registradas?')) {
-                listaTomas = [];
-                contadorTomas = 0;
-                document.getElementById('cuerpo-tabla').innerHTML = `<tr class="text-gray-500 text-center"><td colspan="4" class="p-4">Aún no hay tomas. Seleccioná tu elemento y presioná "Registrar Lap".</td></tr>`;
-                document.getElementById('txt-tomas').innerText = "Tomas: 0";
-                resetCronometro();
-            }
-        }
-
-        function formatearTiempo(ms) {
-            let min = Math.floor(ms / 60000);
-            let seg = Math.floor((ms % 60000) / 1000);
-            let cent = Math.floor((ms % 1000) / 10);
-            return (min < 10 ? "0" : "") + min + ":" + 
-                   (seg < 10 ? "0" : "") + seg + "." + 
-                   (cent < 10 ? "0" : "") + cent;
-        }
-
-        function descargarExcelNativo() {
-            if (typeof XLSX === 'undefined') {
-                alert('La librería de Excel se está cargando. Intente de nuevo.');
-                return;
-            }
-
-            let estudioVal = document.getElementById('input-estudio').value;
-            let operarioVal = document.getElementById('input-operario').value;
-            let taktVal = document.getElementById('input-takt').value;
-
-            let wb = XLSX.utils.book_new();
-            
-            let datos = [
-                ["IE-Pro v3.6.2 - Reporte de Estudio de Tiempos y Métodos"],
-                ["Estudio:", estudioVal],
-                ["Operario:", operarioVal],
-                ["Takt Time (s):", taktVal],
-                [""],
-                ["Toma #", "Elemento de Operación", "Ritmo OIT", "Tiempo Observado (s)"]
-            ];
-
-            if (listaTomas.length === 0) {
-                datos.push(["Sin tomas registradas aún", "", "", ""]);
-            } else {
-                listaTomas.forEach(t => {
-                    datos.push([t.toma, t.elemento, t.ritmo, parseFloat(t.tiempo)]);
-                });
-            }
-
-            let ws = XLSX.utils.aoa_to_sheet(datos);
-            XLSX.utils.book_append_sheet(wb, ws, "Estudio de Tiempos");
-
-            XLSX.writeFile(wb, "Estudio_" + estudioVal.replace(/\s+/g, '_') + ".xlsx");
-        }
-
-        function exportarJSON() {
-            let datosEstudio = {
-                estudio: document.getElementById('input-estudio').value,
-                operario: document.getElementById('input-operario').value,
-                taktTime: document.getElementById('input-takt').value,
-                elementos: elementosOperacion,
-                tomas: listaTomas
-            };
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosEstudio, null, 2));
-            let a = document.createElement('a');
-            a.href = dataStr;
-            a.download = "IE_Pro_Respaldo_Estudio.json";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-    </script>
-</body>
-</html>
+            let tiempoSeg = (milisegundos / 1000).toFixed(
