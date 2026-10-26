@@ -32,7 +32,6 @@
             background-color: #161b22;
             border: 1px solid #30363d;
         }
-        /* Forzar área interactiva táctil óptima en Android */
         button, select, input {
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
@@ -221,7 +220,7 @@
 
     </div>
 
-    <!-- Script con PointerDown Universal Infalible para Celulares -->
+    <!-- Script con Registro Continuo de Laps -->
     <script>
         let timerInterval = null;
         let tiempoInicioElemento = 0;
@@ -243,11 +242,14 @@
             { id: 5, nombre: "5. 9. Colocación de insertos", tipo: "Manual", tomas: [], ritmo: 100 }
         ];
 
-        // Vinculación de eventos con pointerdown para respuesta táctil inmediata
         function registrarAccion(id, fn) {
             let el = document.getElementById(id);
             if(el) {
-                el.addEventListener('pointerdown', function(e) {
+                el.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    fn();
+                });
+                el.addEventListener('touchend', function(e) {
                     e.preventDefault();
                     fn();
                 });
@@ -275,7 +277,7 @@
 
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 let tabNum = parseInt(btn.getAttribute('data-tab'));
-                btn.addEventListener('pointerdown', function(e) {
+                btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     cambiarTab(tabNum);
                 });
@@ -290,6 +292,7 @@
 
         function actualizarSelectElementos() {
             let select = document.getElementById('select-elemento');
+            let valorActual = select.value;
             select.innerHTML = "";
             elementosEstudio.forEach((el, index) => {
                 let opt = document.createElement('option');
@@ -297,6 +300,9 @@
                 opt.text = `${el.nombre} (${el.tipo})`;
                 select.appendChild(opt);
             });
+            if (valorActual < select.options.length) {
+                select.value = valorActual;
+            }
         }
 
         function calcularPromedio(arrayTomas) {
@@ -512,20 +518,22 @@
         function registrarLap() {
             let ahora = Date.now();
             let tiempoObservadoMs = estaCorriendo ? (ahora - tiempoInicioElemento) : acumuladoPausaElemento;
-            if (tiempoObservadoMs < 50) return;
+            if (tiempoObservadoMs < 10) return;
 
             let tiempoSeg = parseFloat((tiempoObservadoMs / 1000).toFixed(2));
             contadorTomasTotales++;
             tiempoAcumuladoGeneralMs += tiempoObservadoMs;
 
-            let indexSel = document.getElementById('select-elemento').value;
-            if(elementosEstudio[indexSel]) {
+            let selectEl = document.getElementById('select-elemento');
+            let indexSel = parseInt(selectEl.value);
+
+            if(!isNaN(indexSel) && elementosEstudio[indexSel]) {
                 elementosEstudio[indexSel].tomas.push(tiempoSeg);
                 renderizarTablaElementos();
                 recalcularTotales();
                 
-                let siguienteIndex = (parseInt(indexSel) + 1) % elementosEstudio.length;
-                document.getElementById('select-elemento').value = siguienteIndex;
+                let siguienteIndex = (indexSel + 1) % elementosEstudio.length;
+                selectEl.value = siguienteIndex;
                 actualizarSeleccionActiva();
             }
 
@@ -535,6 +543,9 @@
 
             acumuladoPausaElemento = 0;
             tiempoInicioElemento = Date.now();
+            if(!estaCorriendo) {
+                tiempoInicioElemento = Date.now();
+            }
             document.getElementById('display-cronometro').innerText = "00:00.00";
         }
 
