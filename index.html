@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- v3.6.3 -->
+<!DOCTYPE html><!-- v3.6.4 -->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -6,7 +6,7 @@
     <title>IE-Pro v3.6 - Ingeniería Industrial & Métodos y Tiempos</title>
 
     <!-- Vinculación del Manifiesto e Ícono Personalizado para Celular -->
-    <link rel="manifest" href="./manifest.json?v=363">
+    <link rel="manifest" href="./manifest.json?v=364">
     <link rel="icon" type="image/png" sizes="512x512" href="./app.png">
     <link rel="apple-touch-icon" sizes="512x512" href="./app.png">
 
@@ -33,7 +33,7 @@
             border: 1px solid #30363d;
         }
         button, select, input {
-            touch-action: manipulation;
+            cursor: pointer;
             -webkit-tap-highlight-color: transparent;
         }
     </style>
@@ -48,17 +48,17 @@
                 <div>
                     <div class="flex items-center space-x-2">
                         <h1 class="text-xl font-bold tracking-wide">IE-Pro</h1>
-                        <span class="bg-blue-600/30 text-blue-400 text-xs px-2 py-0.5 rounded border border-blue-500/30 font-semibold">v3.6.3</span>
+                        <span class="bg-blue-600/30 text-blue-400 text-xs px-2 py-0.5 rounded border border-blue-500/30 font-semibold">v3.6.4</span>
                     </div>
                     <p class="text-xs text-gray-400">Ingeniería Industrial & Métodos y Tiempos</p>
                 </div>
             </div>
 
             <div class="flex flex-wrap gap-2">
-                <button id="b-excel" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
+                <button onclick="descargarExcelNativo()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
                     <span>📥</span><span>Descargar Excel Completo</span>
                 </button>
-                <button id="b-json" class="bg-[#21262d] hover:bg-[#30363d] text-gray-300 border border-[#30363d] text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
+                <button onclick="exportarJSON()" class="bg-[#21262d] hover:bg-[#30363d] text-gray-300 border border-[#30363d] text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
                     <span>💾</span><span>Resp. JSON</span>
                 </button>
             </div>
@@ -82,12 +82,12 @@
 
         <!-- Pestañas de Navegación -->
         <nav class="flex overflow-x-auto space-x-1 bg-[#161b22] p-1.5 rounded-xl border border-[#30363d]">
-            <button data-tab="1" class="tab-btn bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap shadow">1. Cronómetro</button>
-            <button data-tab="2" class="tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">2. Hojas/Ergo</button>
-            <button data-tab="3" class="tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">3. Suplementos</button>
-            <button data-tab="4" class="tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">4. Multitarea</button>
-            <button data-tab="5" class="tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">5. Costos/Takt</button>
-            <button data-tab="6" class="tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">6. Dashboard</button>
+            <button onclick="cambiarTab(1)" id="tab-btn-1" class="tab-btn bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap shadow">1. Cronómetro</button>
+            <button onclick="cambiarTab(2)" id="tab-btn-2" class="tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">2. Hojas/Ergo</button>
+            <button onclick="cambiarTab(3)" id="tab-btn-3" class="tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">3. Suplementos</button>
+            <button onclick="cambiarTab(4)" id="tab-btn-4" class="tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">4. Multitarea</button>
+            <button onclick="cambiarTab(5)" id="tab-btn-5" class="tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">5. Costos/Takt</button>
+            <button onclick="cambiarTab(6)" id="tab-btn-6" class="tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">6. Dashboard</button>
         </nav>
 
         <!-- SECCIÓN 1 -->
@@ -107,9 +107,9 @@
                     </div>
 
                     <div class="flex gap-2">
-                        <button id="b-start" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition">▶ Iniciar / Parar</button>
-                        <button id="b-lap" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition">⏱ Registrar Lap</button>
-                        <button id="b-reset" class="bg-[#21262d] hover:bg-red-900/50 text-gray-300 border border-[#30363d] text-xs px-3 py-2.5 rounded-lg shadow transition">🔄</button>
+                        <button onclick="toggleCronometro()" id="b-start" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition">▶ Iniciar / Parar</button>
+                        <button onclick="registrarLap()" id="b-lap" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition">⏱ Registrar Lap</button>
+                        <button onclick="resetCronometro()" class="bg-[#21262d] hover:bg-red-900/50 text-gray-300 border border-[#30363d] text-xs px-3 py-2.5 rounded-lg shadow transition">🔄</button>
                     </div>
 
                     <div class="flex justify-between text-xs text-gray-400 px-1 font-mono">
@@ -121,7 +121,7 @@
                 <!-- Elemento Activo -->
                 <div class="app-card p-4 rounded-xl shadow-lg space-y-3">
                     <label class="text-xs font-bold text-gray-300 uppercase tracking-wide">ELEMENTO / OPERACIÓN ACTIVA:</label>
-                    <select id="select-elemento" class="w-full bg-[#0b0f19] border border-[#30363d] text-gray-200 text-xs rounded-lg p-2.5 focus:outline-none focus:border-blue-500">
+                    <select id="select-elemento" onchange="actualizarSeleccionActiva()" class="w-full bg-[#0b0f19] border border-[#30363d] text-gray-200 text-xs rounded-lg p-2.5 focus:outline-none focus:border-blue-500">
                         <!-- Se llena dinámicamente -->
                     </select>
 
@@ -130,7 +130,7 @@
                             <span>VALORACIÓN DEL RITMO (OIT %):</span>
                             <span id="ritmo-val" class="bg-[#0b0f19] border border-[#30363d] px-2 py-0.5 rounded text-amber-400 font-mono">100 %</span>
                         </div>
-                        <input type="range" id="range-ritmo" min="50" max="150" value="100" class="w-full accent-blue-600 bg-[#0b0f19] rounded-lg h-2 cursor-pointer">
+                        <input type="range" id="range-ritmo" min="50" max="150" value="100" oninput="actualizarRitmo(this.value)" class="w-full accent-blue-600 bg-[#0b0f19] rounded-lg h-2 cursor-pointer">
                     </div>
                 </div>
 
@@ -148,10 +148,10 @@
                             <p class="text-[11px] text-gray-400">Tiempos Observados (To), Valoración (R) y Promedio Fijo</p>
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
-                            <button id="b-top-ciclo" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg shadow transition flex items-center space-x-1">
+                            <button onclick="toggleCronometroCiclo()" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg shadow transition flex items-center space-x-1">
                                 <span>⏱</span><span>Tiempo Ciclo Total</span>
                             </button>
-                            <button id="b-nuevo-elem" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg shadow transition">
+                            <button onclick="abrirModalNuevoElemento()" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg shadow transition">
                                 + Nuevo Elemento
                             </button>
                         </div>
@@ -161,7 +161,7 @@
                     <div class="bg-[#0b0f19] border border-[#30363d] p-3.5 rounded-xl space-y-2">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-3">
-                                <div id="icon-ciclo" class="bg-amber-500/20 text-amber-400 p-2.5 rounded-lg text-lg shadow cursor-pointer">⏱</div>
+                                <div onclick="toggleCronometroCiclo()" class="bg-amber-500/20 text-amber-400 p-2.5 rounded-lg text-lg shadow cursor-pointer">⏱</div>
                                 <div>
                                     <span class="text-[10px] text-gray-400 uppercase tracking-wider block">PROMEDIO CICLO TOTAL OPERACIÓN</span>
                                     <div class="text-2xl font-mono font-extrabold text-amber-400 tracking-wide flex items-center gap-1">
@@ -171,10 +171,10 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-1.5">
-                                <button id="b-ciclo-start" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-lg shadow transition">
+                                <button onclick="toggleCronometroCiclo()" id="b-ciclo-start" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-lg shadow transition">
                                     ▶ Iniciar
                                 </button>
-                                <button id="b-ciclo-reset" class="bg-[#21262d] hover:bg-red-900/50 text-gray-300 border border-[#30363d] text-xs p-2 rounded-lg shadow transition">
+                                <button onclick="resetCronometroCiclo()" class="bg-[#21262d] hover:bg-red-900/50 text-gray-300 border border-[#30363d] text-xs p-2 rounded-lg shadow transition">
                                     🔄
                                 </button>
                             </div>
@@ -212,15 +212,15 @@
         <!-- SECCIONES EXTRAS -->
         <div id="seccion-contenido-extra" class="hidden app-card p-6 rounded-xl shadow-lg space-y-4 text-center">
             <h2 id="titulo-seccion-activa" class="text-lg font-bold text-amber-400">Módulo en Carga</h2>
-            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura industrial de IE-Pro v3.6.3.</p>
-            <button id="b-volver-main" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow transition">
+            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura industrial de IE-Pro v3.6.4.</p>
+            <button onclick="cambiarTab(1)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow transition">
                 ← Volver al Cronómetro Principal
             </button>
         </div>
 
     </div>
 
-    <!-- Script con Registro Continuo de Laps -->
+    <!-- Script Robusto de Registro Consecutivo -->
     <script>
         let timerInterval = null;
         let tiempoInicioElemento = 0;
@@ -242,53 +242,11 @@
             { id: 5, nombre: "5. 9. Colocación de insertos", tipo: "Manual", tomas: [], ritmo: 100 }
         ];
 
-        function registrarAccion(id, fn) {
-            let el = document.getElementById(id);
-            if(el) {
-                el.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    fn();
-                });
-                el.addEventListener('touchend', function(e) {
-                    e.preventDefault();
-                    fn();
-                });
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
+        window.onload = function() {
             actualizarSelectElementos();
             renderizarTablaElementos();
             recalcularTotales();
-
-            registrarAccion('b-start', toggleCronometro);
-            registrarAccion('b-lap', registrarLap);
-            registrarAccion('b-reset', resetCronometro);
-
-            registrarAccion('b-ciclo-start', toggleCronometroCiclo);
-            registrarAccion('b-ciclo-reset', resetCronometroCiclo);
-            registrarAccion('b-top-ciclo', toggleCronometroCiclo);
-            registrarAccion('icon-ciclo', toggleCronometroCiclo);
-
-            registrarAccion('b-nuevo-elem', abrirModalNuevoElemento);
-            registrarAccion('b-excel', descargarExcelNativo);
-            registrarAccion('b-json', exportarJSON);
-            registrarAccion('b-volver-main', () => cambiarTab(1));
-
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                let tabNum = parseInt(btn.getAttribute('data-tab'));
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    cambiarTab(tabNum);
-                });
-            });
-
-            document.getElementById('input-takt').addEventListener('input', recalcularTotales);
-            document.getElementById('select-elemento').addEventListener('change', actualizarSeleccionActiva);
-            document.getElementById('range-ritmo').addEventListener('input', function(e) {
-                actualizarRitmo(e.target.value);
-            });
-        });
+        };
 
         function actualizarSelectElementos() {
             let select = document.getElementById('select-elemento');
@@ -339,13 +297,13 @@
             });
         }
 
-        window.cambiarRitmoElemento = function(index, nuevoRitmo) {
+        function cambiarRitmoElemento(index, nuevoRitmo) {
             elementosEstudio[index].ritmo = parseFloat(nuevoRitmo) || 100;
             renderizarTablaElementos();
             recalcularTotales();
         }
 
-        window.eliminarElemento = function(index) {
+        function eliminarElemento(index) {
             elementosEstudio.splice(index, 1);
             actualizarSelectElementos();
             renderizarTablaElementos();
@@ -448,13 +406,16 @@
         }
 
         function cambiarTab(num) {
-            document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
-                if(idx + 1 === num) {
-                    btn.className = "tab-btn bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap shadow";
-                } else {
-                    btn.className = "tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition";
+            for(let i=1; i<=6; i++) {
+                let btn = document.getElementById('tab-btn-' + i);
+                if(btn) {
+                    if(i === num) {
+                        btn.className = "tab-btn bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap shadow";
+                    } else {
+                        btn.className = "tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition";
+                    }
                 }
-            });
+            }
 
             const secCronometro = document.getElementById('seccion-1');
             const secExtra = document.getElementById('seccion-contenido-extra');
@@ -517,8 +478,10 @@
 
         function registrarLap() {
             let ahora = Date.now();
-            let tiempoObservadoMs = estaCorriendo ? (ahora - tiempoInicioElemento) : acumuladoPausaElemento;
-            if (tiempoObservadoMs < 10) return;
+            if (!estaCorriendo) return; // Debe estar corriendo para registrar laps válidos
+
+            let tiempoObservadoMs = ahora - tiempoInicioElemento;
+            if (tiempoObservadoMs < 50) return; // Evita doble toque fantasma inferior a 50ms
 
             let tiempoSeg = parseFloat((tiempoObservadoMs / 1000).toFixed(2));
             contadorTomasTotales++;
@@ -532,6 +495,7 @@
                 renderizarTablaElementos();
                 recalcularTotales();
                 
+                // Pasa limpiamente al siguiente elemento de la lista de forma cíclica
                 let siguienteIndex = (indexSel + 1) % elementosEstudio.length;
                 selectEl.value = siguienteIndex;
                 actualizarSeleccionActiva();
@@ -541,11 +505,8 @@
             document.getElementById('txt-acumulado').innerText = formatearTiempo(tiempoAcumuladoGeneralMs);
             document.getElementById('txt-tomas').innerText = "Tomas: " + contadorTomasTotales;
 
-            acumuladoPausaElemento = 0;
+            // Reinicia el contador de la toma actual para medir el siguiente elemento al instante
             tiempoInicioElemento = Date.now();
-            if(!estaCorriendo) {
-                tiempoInicioElemento = Date.now();
-            }
             document.getElementById('display-cronometro').innerText = "00:00.00";
         }
 
@@ -571,7 +532,7 @@
             let wb = XLSX.utils.book_new();
             
             let datosResumen = [
-                ["IE-Pro v3.6.3 - Reporte de Estudio de Tiempos"],
+                ["IE-Pro v3.6.4 - Reporte de Estudio de Tiempos"],
                 ["Estudio:", estudioVal],
                 ["Operario:", operarioVal],
                 ["Takt Time (s):", taktVal],
