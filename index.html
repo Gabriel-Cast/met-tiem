@@ -9,7 +9,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0d1117">
     
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Librería SheetJS para descargas nativas de Excel en celulares -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
     <style>
         body {
             background-color: #0b0f19;
@@ -42,15 +46,15 @@
             <div class="flex flex-wrap gap-2 w-full md:w-auto">
                 <div class="bg-[#0b0f19] border border-[#30363d] px-3 py-1.5 rounded-lg text-xs flex-1 md:flex-initial">
                     <span class="text-gray-400 block text-[10px]">Estudio ✎</span>
-                    <span class="font-medium text-gray-200">Ensamble Motor Línea A</span>
+                    <span class="font-medium text-gray-200" id="info-estudio">Ensamble Motor Línea A</span>
                 </div>
                 <div class="bg-[#0b0f19] border border-[#30363d] px-3 py-1.5 rounded-lg text-xs flex-1 md:flex-initial">
                     <span class="text-gray-400 block text-[10px]">Operario ✎</span>
-                    <span class="font-medium text-gray-200">Juan Pérez (#4021)</span>
+                    <span class="font-medium text-gray-200" id="info-operario">Juan Pérez (#4021)</span>
                 </div>
                 <div class="bg-[#0b0f19] border border-[#30363d] px-3 py-1.5 rounded-lg text-xs">
                     <span class="text-gray-400 block text-[10px]">Takt Time →</span>
-                    <span class="font-bold text-amber-400">48.04s</span>
+                    <span class="font-bold text-amber-400" id="info-takt">48.04s</span>
                 </div>
             </div>
         </header>
@@ -60,8 +64,8 @@
             <button onclick="exportarJSON()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
                 <span>📁</span><span>Abrir Excel / JSON</span>
             </button>
-            <button onclick="descargarExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
-                <span>📥</span><span>Descargar Excel Completo</span>
+            <button onclick="descargarExcelNativo()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
+                <span>📥</span><span>Descargar Excel Completo (.xlsx)</span>
             </button>
             <button onclick="exportarJSON()" class="bg-[#21262d] hover:bg-[#30363d] text-gray-300 border border-[#30363d] text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
                 <span>💾</span><span>Resp. JSON</span>
@@ -78,7 +82,7 @@
             <button onclick="cambiarTab(6)" id="tab-btn-6" class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">6. Dashboard</button>
         </nav>
 
-        <!-- SECCIÓN 1: CRONÓMETRO (Visible por defecto) -->
+        <!-- SECCIÓN 1: CRONÓMETRO -->
         <div id="seccion-1" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
             <div class="lg:col-span-5 space-y-4">
                 <div class="app-card p-4 rounded-xl shadow-lg space-y-3">
@@ -137,10 +141,10 @@
                             </div>
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
-                            <button onclick="alert('Tiempo de ciclo recalculado con éxito.')" class="flex-1 sm:flex-initial bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center justify-center space-x-1">
+                            <button onclick="alert('Tiempo de ciclo recalculado.')" class="flex-1 sm:flex-initial bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center justify-center space-x-1">
                                 <span>🔄</span><span>Tiempo Ciclo Total</span>
                             </button>
-                            <button onclick="alert('Función de nuevo elemento lista.')" class="flex-1 sm:flex-initial bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center justify-center space-x-1">
+                            <button onclick="alert('Función nuevo elemento activa.')" class="flex-1 sm:flex-initial bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center justify-center space-x-1">
                                 <span>+</span><span>Nuevo Elemento</span>
                             </button>
                         </div>
@@ -177,7 +181,6 @@
                                     <th class="p-2.5 font-semibold text-right">TO (S)</th>
                                     <th class="p-2.5 font-semibold text-center">RITMO (%)</th>
                                     <th class="p-2.5 font-semibold text-right">TB (S)</th>
-                                    <th class="p-2.5 font-semibold text-center">ACCIÓN</th>
                                 </tr>
                             </thead>
                             <tbody class="text-xs divide-y divide-[#30363d]">
@@ -186,27 +189,24 @@
                                     <td class="p-2.5"><span class="bg-blue-900/40 text-blue-300 border border-blue-700/40 px-1.5 py-0.5 rounded text-[10px]">Manual</span></td>
                                     <td class="p-2.5 text-center font-mono">4</td>
                                     <td class="p-2.5 text-right font-mono text-amber-400 font-bold">3.55s</td>
-                                    <td class="p-2.5 text-center"><input type="text" value="100" class="bg-[#0b0f19] border border-[#30363d] text-center w-12 py-0.5 rounded text-xs font-mono"> %</td>
+                                    <td class="p-2.5 text-center font-mono">100 %</td>
                                     <td class="p-2.5 text-right font-mono text-gray-200">3.55s</td>
-                                    <td class="p-2.5 text-center"><button class="text-red-400 hover:text-red-300 p-1">🗑</button></td>
                                 </tr>
                                 <tr class="hover:bg-[#1f242c] transition">
                                     <td class="p-2.5 font-medium text-gray-200">2. Atornillar culata (Torque)</td>
                                     <td class="p-2.5"><span class="bg-blue-900/40 text-blue-300 border border-blue-700/40 px-1.5 py-0.5 rounded text-[10px]">Manual</span></td>
                                     <td class="p-2.5 text-center font-mono">4</td>
                                     <td class="p-2.5 text-right font-mono text-amber-400 font-bold">2.92s</td>
-                                    <td class="p-2.5 text-center"><input type="text" value="100" class="bg-[#0b0f19] border border-[#30363d] text-center w-12 py-0.5 rounded text-xs font-mono"> %</td>
+                                    <td class="p-2.5 text-center font-mono">100 %</td>
                                     <td class="p-2.5 text-right font-mono text-gray-200">2.92s</td>
-                                    <td class="p-2.5 text-center"><button class="text-red-400 hover:text-red-300 p-1">🗑</button></td>
                                 </tr>
                                 <tr class="hover:bg-[#1f242c] transition">
                                     <td class="p-2.5 font-medium text-gray-200">3. Ciclo de Prueba Automático</td>
                                     <td class="p-2.5"><span class="bg-purple-900/40 text-purple-300 border border-purple-700/40 px-1.5 py-0.5 rounded text-[10px]">Maquina</span></td>
                                     <td class="p-2.5 text-center font-mono">4</td>
                                     <td class="p-2.5 text-right font-mono text-amber-400 font-bold">17.20s</td>
-                                    <td class="p-2.5 text-center"><input type="text" value="100" class="bg-[#0b0f19] border border-[#30363d] text-center w-12 py-0.5 rounded text-xs font-mono"> %</td>
+                                    <td class="p-2.5 text-center font-mono">100 %</td>
                                     <td class="p-2.5 text-right font-mono text-gray-200">17.20s</td>
-                                    <td class="p-2.5 text-center"><button class="text-red-400 hover:text-red-300 p-1">🗑</button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -215,7 +215,7 @@
             </div>
         </div>
 
-        <!-- SECCIÓN 2 a 6: CONTENIDO DE LAS OTRAS PESTAÑAS -->
+        <!-- SECCIONES EXTRAS -->
         <div id="seccion-contenido-extra" class="hidden app-card p-6 rounded-xl shadow-lg space-y-4 text-center">
             <h2 id="titulo-seccion-activa" class="text-lg font-bold text-amber-400">Módulo en Carga</h2>
             <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura de ingeniería industrial de IE-Pro v3.6.</p>
@@ -229,7 +229,7 @@
 
     </div>
 
-    <!-- Scripts de Funcionalidad y Navegación Real -->
+    <!-- Script con exportación directa XLSX nativa -->
     <script>
         let timerInterval = null;
         let milisegundos = 0;
@@ -313,16 +313,34 @@
                    (cent < 10 ? "0" : "") + cent;
         }
 
-        function descargarExcel() {
-            let htmlTabla = document.getElementById('tabla-elementos').outerHTML;
-            let blob = new Blob([ '\ufeff' + htmlTabla ], { type: 'application/vnd.ms-excel' });
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = 'Estudio_Tiempos_IE_Pro.xls';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+        // DESCARGA REAL EXCEL NATIVO (.XLSX)
+        function descargarExcelNativo() {
+            if (typeof XLSX === 'undefined') {
+                alert('La librería de Excel se está cargando. Intente de nuevo en unos segundos.');
+                return;
+            }
+
+            // Crear libro de trabajo
+            let wb = XLSX.utils.book_new();
+            
+            // Datos del encabezado y la tabla
+            let datos = [
+                ["IE-Pro v3.6 - Reporte de Estudio de Tiempos"],
+                ["Estudio:", "Ensamble Motor Línea A"],
+                ["Operario:", "Juan Pérez (#4021)"],
+                ["Takt Time:", "48.04s"],
+                [""],
+                ["Elemento", "Tipo", "Muestras (N)", "Tiempo Obs. To (s)", "Ritmo (%)", "Tiempo Básico Tb (s)"],
+                ["1. Tomar block de motor y fijar", "Manual", 4, 3.55, 100, 3.55],
+                ["2. Atornillar culata (Torque)", "Manual", 4, 2.92, 100, 2.92],
+                ["3. Ciclo de Prueba Automático", "Maquina", 4, 17.20, 100, 17.20]
+            ];
+
+            let ws = XLSX.utils.aoa_to_sheet(datos);
+            XLSX.utils.book_append_sheet(wb, ws, "Estudio de Tiempos");
+
+            // Descargar directamente archivo .xlsx nativo
+            XLSX.writeFile(wb, "Estudio_IE_Pro_v3.6.xlsx");
         }
 
         function exportarJSON() {
