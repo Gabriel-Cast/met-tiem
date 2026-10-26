@@ -60,25 +60,25 @@
 
         <!-- Barra de Botones de Exportación -->
         <div class="flex flex-wrap gap-2">
-            <button class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
+            <button onclick="alert('Abriendo gestor de datos Excel / JSON...')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
                 <span>📁</span><span>Abrir Excel / JSON</span>
             </button>
-            <button class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
+            <button onclick="alert('Generando descarga de Excel completo...')" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
                 <span>📥</span><span>Descargar Excel Completo</span>
             </button>
-            <button class="bg-[#21262d] hover:bg-[#30363d] text-gray-300 border border-[#30363d] text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
+            <button onclick="alert('Respaldo JSON exportado con éxito.')" class="bg-[#21262d] hover:bg-[#30363d] text-gray-300 border border-[#30363d] text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
                 <span>💾</span><span>Resp. JSON</span>
             </button>
         </div>
 
         <!-- Pestañas de Navegación -->
-        <nav class="flex overflow-x-auto space-x-1 bg-[#161b22] p-1.5 rounded-xl border border-[#30363d] scrollbar-none">
-            <button class="bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap shadow">1. Cronómetro</button>
-            <button class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">2. Hojas/Ergo</button>
-            <button class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">3. Suplementos</button>
-            <button class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">4. Multitarea</button>
-            <button class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">5. Costos/Takt</button>
-            <button class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">6. Dashboard</button>
+        <nav class="flex overflow-x-auto space-x-1 bg-[#161b22] p-1.5 rounded-xl border border-[#30363d]">
+            <button onclick="cambiarTab(1)" id="tab-1" class="bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap shadow">1. Cronómetro</button>
+            <button onclick="cambiarTab(2)" id="tab-2" class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">2. Hojas/Ergo</button>
+            <button onclick="cambiarTab(3)" id="tab-3" class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">3. Suplementos</button>
+            <button onclick="cambiarTab(4)" id="tab-4" class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">4. Multitarea</button>
+            <button onclick="cambiarTab(5)" id="tab-5" class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">5. Costos/Takt</button>
+            <button onclick="cambiarTab(6)" id="tab-6" class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">6. Dashboard</button>
         </nav>
 
         <!-- Contenido Principal: Grid de 2 Columnas -->
@@ -91,18 +91,25 @@
                 <div class="app-card p-4 rounded-xl shadow-lg space-y-3">
                     <div class="flex justify-between items-center">
                         <span class="bg-[#21262d] border border-[#30363d] text-gray-300 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">CRONÓMETRO DIGITAL</span>
-                        <span class="text-xs text-gray-400">Tomas: 12</span>
+                        <span id="txt-tomas" class="text-xs text-gray-400">Tomas: 12</span>
                     </div>
 
                     <!-- Display de Tiempo Principal -->
                     <div class="bg-[#0b0f19] border border-[#30363d] py-6 rounded-xl text-center shadow-inner">
-                        <div class="text-4xl md:text-5xl font-mono font-extrabold text-amber-500 tracking-wider">00:00.00</div>
+                        <div id="display-cronometro" class="text-4xl md:text-5xl font-mono font-extrabold text-amber-500 tracking-wider">00:00.00</div>
+                    </div>
+
+                    <!-- Controles de Cronómetro -->
+                    <div class="flex gap-2">
+                        <button onclick="toggleCronometro()" id="btn-iniciar" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition">▶ Iniciar / Parar</button>
+                        <button onclick="registrarLap()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition">⏱ Registrar Lap</button>
+                        <button onclick="resetCronometro()" class="bg-[#21262d] hover:bg-red-900/50 text-gray-300 border border-[#30363d] text-xs px-3 py-2.5 rounded-lg shadow transition">🔄</button>
                     </div>
 
                     <!-- Acumulado y Último Lap -->
                     <div class="flex justify-between text-xs text-gray-400 px-1 font-mono">
-                        <div>ACUMULADO: <span class="text-gray-200 font-semibold">00:00.00</span></div>
-                        <div>ÚLTIMO LAP: <span class="text-gray-200 font-semibold">00:00.00</span></div>
+                        <div>ACUMULADO: <span id="txt-acumulado" class="text-gray-200 font-semibold">00:00.00</span></div>
+                        <div>ÚLTIMO LAP: <span id="txt-lap" class="text-gray-200 font-semibold">00:00.00</span></div>
                     </div>
                 </div>
 
@@ -118,9 +125,9 @@
                     <div class="space-y-1.5 pt-1">
                         <div class="flex justify-between text-xs font-medium text-gray-300">
                             <span>VALORACIÓN DEL RITMO (OIT %):</span>
-                            <span class="bg-[#0b0f19] border border-[#30363d] px-2 py-0.5 rounded text-amber-400 font-mono">100 %</span>
+                            <span id="ritmo-val" class="bg-[#0b0f19] border border-[#30363d] px-2 py-0.5 rounded text-amber-400 font-mono">100 %</span>
                         </div>
-                        <input type="range" min="50" max="150" value="100" class="w-full accent-blue-600 bg-[#0b0f19] rounded-lg h-2 cursor-pointer">
+                        <input type="range" id="range-ritmo" min="50" max="150" value="100" oninput="actualizarRitmo(this.value)" class="w-full accent-blue-600 bg-[#0b0f19] rounded-lg h-2 cursor-pointer">
                         <div class="flex justify-between text-[10px] text-gray-500 font-mono">
                             <span>60% (Lento)</span>
                             <span>100% (Normal)</span>
@@ -144,10 +151,10 @@
                             </div>
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
-                            <button class="flex-1 sm:flex-initial bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center justify-center space-x-1">
+                            <button onclick="alert('Calculando Tiempo de Ciclo Total...')" class="flex-1 sm:flex-initial bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center justify-center space-x-1">
                                 <span>🔄</span><span>Tiempo Ciclo Total</span>
                             </button>
-                            <button class="flex-1 sm:flex-initial bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center justify-center space-x-1">
+                            <button onclick="alert('Función para agregar nuevo elemento')" class="flex-1 sm:flex-initial bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center justify-center space-x-1">
                                 <span>+</span><span>Nuevo Elemento</span>
                             </button>
                         </div>
@@ -227,5 +234,79 @@
 
         </div>
     </div>
+
+    <!-- Scripts de Funcionalidad -->
+    <script>
+        let timerInterval = null;
+        let milisegundos = 0;
+        let estaCorriendo = false;
+
+        function actualizarRitmo(val) {
+            document.getElementById('ritmo-val').innerText = val + ' %';
+        }
+
+        function cambiarTab(num) {
+            for(let i=1; i<=6; i++) {
+                let btn = document.getElementById('tab-' + i);
+                if(i === num) {
+                    btn.className = "bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap shadow";
+                } else {
+                    btn.className = "text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition";
+                }
+            }
+            if(num !== 1) {
+                alert('Sección ' + num + ' seleccionada. (Módulo operativo listo para cargar datos)');
+            }
+        }
+
+        function toggleCronometro() {
+            const btn = document.getElementById('btn-iniciar');
+            if (!estaCorriendo) {
+                estaCorriendo = true;
+                btn.innerText = "⏸ Pausar";
+                btn.className = "flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition";
+                let inicioTiempo = Date.now() - milisegundos;
+                timerInterval = setInterval(() => {
+                    milisegundos = Date.now() - inicioTiempo;
+                    document.getElementById('display-cronometro').innerText = formatearTiempo(milisegundos);
+                }, 10);
+            } else {
+                pausarCronometro();
+            }
+        }
+
+        function pausarCronometro() {
+            estaCorriendo = false;
+            clearInterval(timerInterval);
+            const btn = document.getElementById('btn-iniciar');
+            btn.innerText = "▶ Reanudar";
+            btn.className = "flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition";
+        }
+
+        function resetCronometro() {
+            pausarCronometro();
+            milisegundos = 0;
+            document.getElementById('display-cronometro').innerText = "00:00.00";
+            document.getElementById('txt-acumulado').innerText = "00:00.00";
+            document.getElementById('txt-lap').innerText = "00:00.00";
+            const btn = document.getElementById('btn-iniciar');
+            btn.innerText = "▶ Iniciar / Parar";
+        }
+
+        function registrarLap() {
+            let tiempoActualStr = formatearTiempo(milisegundos);
+            document.getElementById('txt-lap').innerText = tiempoActualStr;
+            document.getElementById('txt-acumulado').innerText = tiempoActualStr;
+        }
+
+        function formatearTiempo(ms) {
+            let min = Math.floor(ms / 60000);
+            let seg = Math.floor((ms % 60000) / 1000);
+            let cent = Math.floor((ms % 1000) / 10);
+            return (min < 10 ? "0" : "") + min + ":" + 
+                   (seg < 10 ? "0" : "") + seg + "." + 
+                   (cent < 10 ? "0" : "") + cent;
+        }
+    </script>
 </body>
 </html>
