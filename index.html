@@ -50,32 +50,31 @@
                 </div>
             </div>
 
+            <div class="flex flex-wrap gap-2">
+                <button onclick="descargarExcelNativo()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
+                    <span>📥</span><span>Descargar Excel Completo</span>
+                </button>
+                <button onclick="exportarJSON()" class="bg-[#21262d] hover:bg-[#30363d] text-gray-300 border border-[#30363d] text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
+                    <span>💾</span><span>Resp. JSON</span>
+                </button>
+            </div>
+
             <!-- Campos Editables del Estudio -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full lg:w-auto">
                 <div class="bg-[#0b0f19] border border-[#30363d] px-3 py-1.5 rounded-lg text-xs">
                     <span class="text-gray-400 block text-[10px]">Estudio ✎</span>
-                    <input type="text" id="input-estudio" value="Ensamble Motor Línea A" class="bg-transparent font-medium text-gray-200 w-full focus:outline-none focus:border-blue-500 border-b border-transparent">
+                    <input type="text" id="input-estudio" value="Estudio Moldeo PPV-001A" class="bg-transparent font-medium text-gray-200 w-full focus:outline-none focus:border-blue-500 border-b border-transparent">
                 </div>
                 <div class="bg-[#0b0f19] border border-[#30363d] px-3 py-1.5 rounded-lg text-xs">
                     <span class="text-gray-400 block text-[10px]">Operario ✎</span>
-                    <input type="text" id="input-operario" value="Juan Pérez (#4021)" class="bg-transparent font-medium text-gray-200 w-full focus:outline-none focus:border-blue-500 border-b border-transparent">
+                    <input type="text" id="input-operario" value="Operario Importado" class="bg-transparent font-medium text-gray-200 w-full focus:outline-none focus:border-blue-500 border-b border-transparent">
                 </div>
                 <div class="bg-[#0b0f19] border border-[#30363d] px-3 py-1.5 rounded-lg text-xs">
                     <span class="text-gray-400 block text-[10px]">Takt Time (s) ✎</span>
-                    <input type="text" id="input-takt" value="48.04" class="bg-transparent font-bold text-amber-400 w-full focus:outline-none focus:border-blue-500 border-b border-transparent">
+                    <input type="text" id="input-takt" value="48.04s" class="bg-transparent font-bold text-amber-400 w-full focus:outline-none focus:border-blue-500 border-b border-transparent">
                 </div>
             </div>
         </header>
-
-        <!-- Barra de Botones de Exportación -->
-        <div class="flex flex-wrap gap-2">
-            <button onclick="descargarExcelNativo()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
-                <span>📥</span><span>Descargar Excel Completo (.xlsx)</span>
-            </button>
-            <button onclick="exportarJSON()" class="bg-[#21262d] hover:bg-[#30363d] text-gray-300 border border-[#30363d] text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
-                <span>💾</span><span>Resp. JSON / Cargar</span>
-            </button>
-        </div>
 
         <!-- Pestañas de Navegación -->
         <nav class="flex overflow-x-auto space-x-1 bg-[#161b22] p-1.5 rounded-xl border border-[#30363d]">
@@ -87,16 +86,15 @@
             <button onclick="cambiarTab(6)" id="tab-btn-6" class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">6. Dashboard</button>
         </nav>
 
-        <!-- SECCIÓN 1: CRONÓMETRO Y GESTOR DE ELEMENTOS -->
+        <!-- SECCIÓN 1: CRONÓMETRO Y GESTOR DE ELEMENTOS (DISEÑO ORIGINAL) -->
         <div id="seccion-1" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
             
-            <!-- Columna Izquierda: Cronómetro y Selector de Elemento Activo -->
+            <!-- Columna Izquierda: Cronómetro Digital y Control de Ritmo -->
             <div class="lg:col-span-5 space-y-4">
                 
-                <!-- Tarjeta de Cronómetro -->
                 <div class="app-card p-4 rounded-xl shadow-lg space-y-3">
                     <div class="flex justify-between items-center">
-                        <span class="bg-[#21262d] border border-[#30363d] text-gray-300 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">CRONÓMETRO DE CICLO</span>
+                        <span class="bg-[#21262d] border border-[#30363d] text-gray-300 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">CRONÓMETRO DIGITAL</span>
                         <span id="txt-tomas" class="text-xs text-gray-400">Tomas: 0</span>
                     </div>
 
@@ -116,13 +114,10 @@
                     </div>
                 </div>
 
-                <!-- Tarjeta de Elemento Activo y Ritmo OIT -->
+                <!-- Elemento / Operación Activa -->
                 <div class="app-card p-4 rounded-xl shadow-lg space-y-3">
-                    <div class="flex justify-between items-center">
-                        <label class="text-xs font-bold text-gray-300 uppercase tracking-wide">ELEMENTO ACTUAL A CRONOMETRAR:</label>
-                    </div>
-                    
-                    <select id="select-elemento" class="w-full bg-[#0b0f19] border border-[#30363d] text-gray-200 text-sm rounded-lg p-2.5 focus:outline-none focus:border-blue-500">
+                    <label class="text-xs font-bold text-gray-300 uppercase tracking-wide">ELEMENTO / OPERACIÓN ACTIVA:</label>
+                    <select id="select-elemento" onchange="actualizarSeleccionActiva()" class="w-full bg-[#0b0f19] border border-[#30363d] text-gray-200 text-xs rounded-lg p-2.5 focus:outline-none focus:border-blue-500">
                         <!-- Se llena dinámicamente -->
                     </select>
 
@@ -132,61 +127,73 @@
                             <span id="ritmo-val" class="bg-[#0b0f19] border border-[#30363d] px-2 py-0.5 rounded text-amber-400 font-mono">100 %</span>
                         </div>
                         <input type="range" id="range-ritmo" min="50" max="150" value="100" oninput="actualizarRitmo(this.value)" class="w-full accent-blue-600 bg-[#0b0f19] rounded-lg h-2 cursor-pointer">
-                    </div>
-                </div>
-
-                <!-- Panel de Creación de Elementos -->
-                <div class="app-card p-4 rounded-xl shadow-lg space-y-3 border border-blue-500/30">
-                    <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wide">➕ Agregar Nuevo Elemento al Estudio</h3>
-                    <div class="space-y-2">
-                        <input type="text" id="nuevo-elem-nombre" placeholder="Nombre del elemento (ej: Colocar tornillo)" class="w-full bg-[#0b0f19] border border-[#30363d] text-gray-200 text-xs rounded-lg p-2 focus:outline-none focus:border-blue-500">
-                        <div class="flex gap-2">
-                            <select id="nuevo-elem-tipo" class="bg-[#0b0f19] border border-[#30363d] text-gray-300 text-xs rounded-lg p-2 focus:outline-none">
-                                <option value="Manual">Manual</option>
-                                <option value="Máquina">Máquina</option>
-                            </select>
-                            <button onclick="agregarElementoPersonalizado()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 rounded-lg shadow transition">
-                                Añadir a la lista
-                            </button>
+                        <div class="flex justify-between text-[10px] text-gray-500 font-mono">
+                            <span>50% (Lento)</span>
+                            <span>100% (Normal)</span>
+                            <span>150% (Rápido)</span>
                         </div>
                     </div>
                 </div>
 
             </div>
 
-            <!-- Columna Derecha: Tabla de Tomas Registradas -->
+            <!-- Columna Derecha: Desglose de Elementos y Tabla Original -->
             <div class="lg:col-span-7 space-y-4">
                 <div class="app-card p-4 rounded-xl shadow-lg space-y-4">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-lg">📋</span>
-                            <div>
-                                <h2 class="text-sm font-bold text-gray-200">Desglose de Tomas Registradas</h2>
-                                <p class="text-[11px] text-gray-400">Tiempos Observados (To) y Valoración OIT por Ciclo</p>
-                            </div>
+                    
+                    <!-- Header Desglose y Botones Superiores -->
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#30363d] pb-3">
+                        <div>
+                            <h2 class="text-sm font-bold text-gray-200 flex items-center space-x-1.5">
+                                <span>📋</span><span>Desglose de Elementos</span>
+                            </h2>
+                            <p class="text-[11px] text-gray-400">Tiempos Observados (To), Valoración (R) y Tiempo Básico (Tb)</p>
                         </div>
-                        <button onclick="limpiarTomas()" class="bg-red-900/40 hover:bg-red-900/70 text-red-300 border border-red-700/50 text-xs font-semibold px-3 py-1.5 rounded-lg shadow transition">
-                            🗑 Limpiar Tomas
-                        </button>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <button class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg shadow transition flex items-center space-x-1">
+                                <span>⏱</span><span>Tiempo Ciclo Total</span>
+                            </button>
+                            <button onclick="abrirModalNuevoElemento()" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg shadow transition flex items-center space-x-1">
+                                <span>+</span><span>Nuevo Elemento</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="overflow-x-auto border border-[#30363d] rounded-xl max-h-[420px]">
-                        <table id="tabla-elementos" class="w-full text-left border-collapse">
+                    <!-- Tarjeta de Resumen de Ciclo Total -->
+                    <div class="bg-[#0b0f19] border border-[#30363d] p-3 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="bg-amber-500/20 text-amber-400 p-2 rounded-lg text-sm">⏱</div>
+                            <div>
+                                <span class="text-[10px] text-gray-400 uppercase tracking-wider block">TIEMPO DE CICLO TOTAL OPERACIÓN</span>
+                                <div class="text-lg font-mono font-bold text-amber-400" id="txt-ciclo-total">0.00 s</div>
+                            </div>
+                        </div>
+                        <div class="text-right text-[11px] text-gray-400 space-y-0.5">
+                            <div>Suma Elementos (To): <span id="txt-suma-to" class="text-blue-400 font-mono font-semibold">0.00 s</span></div>
+                            <div class="text-emerald-400">Estructura sincronizada v3.6.3</div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla Original de Elementos -->
+                    <div class="overflow-x-auto border border-[#30363d] rounded-xl max-h-[380px]">
+                        <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="bg-[#0b0f19] text-[11px] text-gray-400 border-b border-[#30363d] sticky top-0">
-                                    <th class="p-2.5 font-semibold text-center">TOMA #</th>
-                                    <th class="p-2.5 font-semibold">ELEMENTO</th>
-                                    <th class="p-2.5 font-semibold text-center">RITMO</th>
-                                    <th class="p-2.5 font-semibold text-right">TIEMPO (S)</th>
+                                <tr class="bg-[#0b0f19] text-[10px] text-gray-400 border-b border-[#30363d] sticky top-0">
+                                    <th class="p-2.5 font-semibold"># / ELEMENTO</th>
+                                    <th class="p-2.5 font-semibold text-center">TIPO</th>
+                                    <th class="p-2.5 font-semibold text-center">N</th>
+                                    <th class="p-2.5 font-semibold text-right">TO (S)</th>
+                                    <th class="p-2.5 font-semibold text-center">RITMO (%)</th>
+                                    <th class="p-2.5 font-semibold text-right">TB (S)</th>
+                                    <th class="p-2.5 font-semibold text-center">ACCIÓN</th>
                                 </tr>
                             </thead>
-                            <tbody id="cuerpo-tabla" class="text-xs divide-y divide-[#30363d]">
-                                <tr class="text-gray-500 text-center">
-                                    <td colspan="4" class="p-4">Aún no hay tomas. Seleccioná tu elemento y presioná "Registrar Lap".</td>
-                                </tr>
+                            <tbody id="cuerpo-tabla-elementos" class="text-xs divide-y divide-[#30363d]">
+                                <!-- Se llena dinámicamente con la estructura original -->
                             </tbody>
                         </table>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -194,7 +201,7 @@
         <!-- SECCIONES EXTRAS -->
         <div id="seccion-contenido-extra" class="hidden app-card p-6 rounded-xl shadow-lg space-y-4 text-center">
             <h2 id="titulo-seccion-activa" class="text-lg font-bold text-amber-400">Módulo en Carga</h2>
-            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura de ingeniería industrial de IE-Pro v3.6.3.</p>
+            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura industrial de IE-Pro v3.6.3.</p>
             <button onclick="cambiarTab(1)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow transition">
                 ← Volver al Cronómetro Principal
             </button>
@@ -202,59 +209,123 @@
 
     </div>
 
-    <!-- Script con la lógica original del cronómetro de ciclo -->
+    <!-- Script con la Lógica Completa de la Interfaz Original -->
     <script>
         let timerInterval = null;
         let tiempoInicio = 0;
         let tiempoAcumuladoPausa = 0;
         let estaCorriendo = false;
-        let listaTomas = [];
         let contadorTomas = 0;
+        let listaTomasRealizadas = [];
 
-        let elementosOperacion = [
-            { id: 1, nombre: "1. Tomar block de motor y fijar", tipo: "Manual" },
-            { id: 2, nombre: "2. Atornillar culata (Torque)", tipo: "Manual" },
-            { id: 3, nombre: "3. Ciclo de Prueba Automático", tipo: "Máquina" }
+        // Lista base de elementos idéntica a la vista original
+        let elementosEstudio = [
+            { id: 1, nombre: "1. 4. 1- Alineación de conformadores", tipo: "Manual", to: 3.00, ritmo: 100, n: 1 },
+            { id: 2, nombre: "2. 5. Es cuadrado", tipo: "Manual", to: 3.00, ritmo: 100, n: 1 },
+            { id: 3, nombre: "3. 7. Colocación de desmoldante", tipo: "Manual", to: 3.00, ritmo: 100, n: 1 },
+            { id: 4, nombre: "4. 8. Colocación de armadura", tipo: "Manual", to: 3.00, ritmo: 100, n: 1 },
+            { id: 5, nombre: "5. 9. Colocación de insertos", tipo: "Manual", to: 3.00, ritmo: 100, n: 1 }
         ];
 
         window.onload = function() {
             actualizarSelectElementos();
+            renderizarTablaElementos();
+            recalcularTotales();
         };
 
         function actualizarSelectElementos() {
             let select = document.getElementById('select-elemento');
             select.innerHTML = "";
-            elementosOperacion.forEach(el => {
+            elementosEstudio.forEach((el, index) => {
                 let opt = document.createElement('option');
-                opt.value = el.nombre;
+                opt.value = index;
                 opt.text = `${el.nombre} (${el.tipo})`;
                 select.appendChild(opt);
             });
         }
 
-        function agregarElementoPersonalizado() {
-            let inputNombre = document.getElementById('nuevo-elem-nombre');
-            let selectTipo = document.getElementById('nuevo-elem-tipo');
-            let nombreVal = inputNombre.value.trim();
+        function renderizarTablaElementos() {
+            let cuerpo = document.getElementById('cuerpo-tabla-elementos');
+            cuerpo.innerHTML = "";
 
-            if (!nombreVal) {
-                alert('Por favor ingrese el nombre del elemento.');
-                return;
-            }
+            elementosEstudio.forEach((el, index) => {
+                let tb = ((el.to * el.ritmo) / 100).toFixed(2);
+                let fila = document.createElement('tr');
+                fila.className = "hover:bg-[#1f242c] transition";
+                fila.innerHTML = `
+                    <td class="p-2.5 font-medium text-gray-200">${el.nombre}</td>
+                    <td class="p-2.5 text-center"><span class="bg-[#21262d] text-gray-300 text-[10px] px-2 py-0.5 rounded border border-[#30363d]">${el.tipo}</span></td>
+                    <td class="p-2.5 text-center font-mono">${el.n}</td>
+                    <td class="p-2.5 text-right font-mono text-gray-200">${el.to.toFixed(2)}s</td>
+                    <td class="p-2.5 text-center font-mono">
+                        <input type="number" value="${el.ritmo}" onchange="cambiarRitmoElemento(${index}, this.value)" class="w-14 bg-[#0b0f19] border border-[#30363d] text-center text-amber-400 rounded py-0.5 text-xs focus:outline-none focus:border-blue-500">
+                    </td>
+                    <td class="p-2.5 text-right font-mono text-amber-400 font-bold">${tb}s</td>
+                    <td class="p-2.5 text-center">
+                        <button onclick="eliminarElemento(${index})" class="bg-red-900/40 hover:bg-red-900/70 text-red-300 px-2 py-1 rounded text-xs transition">🗑</button>
+                    </td>
+                `;
+                cuerpo.appendChild(fila);
+            });
+        }
 
-            let nuevoId = elementosOperacion.length + 1;
-            elementosOperacion.push({
-                id: nuevoId,
-                nombre: `${nuevoId}. ${nombreVal}`,
-                tipo: selectTipo.value
+        function cambiarRitmoElemento(index, nuevoRitmo) {
+            elementosEstudio[index].ritmo = parseFloat(nuevoRitmo) || 100;
+            renderizarTablaElementos();
+            recalcularTotales();
+        }
+
+        function eliminarElemento(index) {
+            elementosEstudio.splice(index, 1);
+            actualizarSelectElementos();
+            renderizarTablaElementos();
+            recalcularTotales();
+        }
+
+        function abrirModalNuevoElemento() {
+            let nombre = prompt("Ingrese el nombre del nuevo elemento:");
+            if (!nombre) return;
+            let tipo = prompt("Tipo (Manual / Máquina):", "Manual");
+            
+            elementosEstudio.push({
+                id: elementosEstudio.length + 1,
+                nombre: `${elementosEstudio.length + 1}. ${nombre}`,
+                tipo: tipo || "Manual",
+                to: 3.00,
+                ritmo: 100,
+                n: 1
             });
 
-            inputNombre.value = "";
             actualizarSelectElementos();
+            renderizarTablaElementos();
+            recalcularTotales();
+        }
+
+        function recalcularTotales() {
+            let sumaTo = 0;
+            elementosEstudio.forEach(el => {
+                sumaTo += el.to;
+            });
+            document.getElementById('txt-suma-to').innerText = sumaTo.toFixed(2) + " s";
+            document.getElementById('txt-ciclo-total').innerText = sumaTo.toFixed(2) + " s";
         }
 
         function actualizarRitmo(val) {
             document.getElementById('ritmo-val').innerText = val + ' %';
+            let indexSel = document.getElementById('select-elemento').value;
+            if(elementosEstudio[indexSel]) {
+                elementosEstudio[indexSel].ritmo = parseInt(val);
+                renderizarTablaElementos();
+                recalcularTotales();
+            }
+        }
+
+        function actualizarSeleccionActiva() {
+            let indexSel = document.getElementById('select-elemento').value;
+            if(elementosEstudio[indexSel]) {
+                document.getElementById('range-ritmo').value = elementosEstudio[indexSel].ritmo;
+                document.getElementById('ritmo-val').innerText = elementosEstudio[indexSel].ritmo + ' %';
+            }
         }
 
         function cambiarTab(num) {
@@ -326,47 +397,22 @@
 
             contadorTomas++;
             let tiempoActualStr = formatearTiempo(tiempoActualMs);
-            let elementoSel = document.getElementById('select-elemento').value;
-            let ritmoVal = document.getElementById('range-ritmo').value + "%";
-            let tiempoSeg = (tiempoActualMs / 1000).toFixed(2);
-
-            listaTomas.push({
-                toma: contadorTomas,
-                elemento: elementoSel,
-                ritmo: ritmoVal,
-                tiempo: tiempoSeg
-            });
+            let tiempoSeg = parseFloat((tiempoActualMs / 1000).toFixed(2));
+            
+            let indexSel = document.getElementById('select-elemento').value;
+            if(elementosEstudio[indexSel]) {
+                elementosEstudio[indexSel].to = tiempoSeg;
+                elementosEstudio[indexSel].n = contadorTomas;
+                renderizarTablaElementos();
+                recalcularTotales();
+            }
 
             document.getElementById('txt-lap').innerText = tiempoActualStr;
             document.getElementById('txt-acumulado').innerText = tiempoActualStr;
             document.getElementById('txt-tomas').innerText = "Tomas: " + contadorTomas;
 
-            let cuerpo = document.getElementById('cuerpo-tabla');
-            if (contadorTomas === 1) cuerpo.innerHTML = "";
-
-            let fila = document.createElement('tr');
-            fila.className = "hover:bg-[#1f242c] transition";
-            fila.innerHTML = `
-                <td class="p-2.5 text-center font-mono">${contadorTomas}</td>
-                <td class="p-2.5 font-medium text-gray-200">${elementoSel}</td>
-                <td class="p-2.5 text-center font-mono">${ritmoVal}</td>
-                <td class="p-2.5 text-right font-mono text-amber-400 font-bold">${tiempoSeg}s</td>
-            `;
-            cuerpo.appendChild(fila);
-
-            // Reiniciar el cronómetro de ciclo para la siguiente toma
             resetCronometro();
             toggleCronometro();
-        }
-
-        function limpiarTomas() {
-            if(confirm('¿Desea limpiar todas las tomas registradas?')) {
-                listaTomas = [];
-                contadorTomas = 0;
-                document.getElementById('cuerpo-tabla').innerHTML = `<tr class="text-gray-500 text-center"><td colspan="4" class="p-4">Aún no hay tomas. Seleccioná tu elemento y presioná "Registrar Lap".</td></tr>`;
-                document.getElementById('txt-tomas').innerText = "Tomas: 0";
-                resetCronometro();
-            }
         }
 
         function formatearTiempo(ms) {
@@ -391,25 +437,21 @@
             let wb = XLSX.utils.book_new();
             
             let datos = [
-                ["IE-Pro v3.6.3 - Reporte de Estudio de Tiempos y Métodos"],
+                ["IE-Pro v3.6.3 - Reporte de Estudio de Tiempos"],
                 ["Estudio:", estudioVal],
                 ["Operario:", operarioVal],
-                ["Takt Time (s):", taktVal],
+                ["Takt Time:", taktVal],
                 [""],
-                ["Toma #", "Elemento de Operación", "Ritmo OIT", "Tiempo Observado (s)"]
+                ["# / Elemento", "Tipo", "N", "To (s)", "Ritmo (%)", "Tb (s)"]
             ];
 
-            if (listaTomas.length === 0) {
-                datos.push(["Sin tomas registradas aún", "", "", ""]);
-            } else {
-                listaTomas.forEach(t => {
-                    datos.push([t.toma, t.elemento, t.ritmo, parseFloat(t.tiempo)]);
-                });
-            }
+            elementosEstudio.forEach(el => {
+                let tb = (el.to * el.ritmo) / 100;
+                datos.push([el.nombre, el.tipo, el.n, el.to, el.ritmo, tb]);
+            });
 
             let ws = XLSX.utils.aoa_to_sheet(datos);
-            XLSX.utils.book_append_sheet(wb, ws, "Estudio de Tiempos");
-
+            XLSX.utils.book_append_sheet(wb, ws, "Desglose de Elementos");
             XLSX.writeFile(wb, "Estudio_" + estudioVal.replace(/\s+/g, '_') + ".xlsx");
         }
 
@@ -418,8 +460,7 @@
                 estudio: document.getElementById('input-estudio').value,
                 operario: document.getElementById('input-operario').value,
                 taktTime: document.getElementById('input-takt').value,
-                elementos: elementosOperacion,
-                tomas: listaTomas
+                elementos: elementosEstudio
             };
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosEstudio, null, 2));
             let a = document.createElement('a');
