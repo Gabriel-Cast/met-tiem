@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!-- v3.6.1 -->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -44,7 +44,7 @@
                 <div>
                     <div class="flex items-center space-x-2">
                         <h1 class="text-xl font-bold tracking-wide">IE-Pro</h1>
-                        <span class="bg-blue-600/30 text-blue-400 text-xs px-2 py-0.5 rounded border border-blue-500/30 font-semibold">v3.6</span>
+                        <span class="bg-blue-600/30 text-blue-400 text-xs px-2 py-0.5 rounded border border-blue-500/30 font-semibold">v3.6.1</span>
                     </div>
                     <p class="text-xs text-gray-400">Ingeniería Industrial & Métodos y Tiempos</p>
                 </div>
@@ -194,7 +194,7 @@
         <!-- SECCIONES EXTRAS -->
         <div id="seccion-contenido-extra" class="hidden app-card p-6 rounded-xl shadow-lg space-y-4 text-center">
             <h2 id="titulo-seccion-activa" class="text-lg font-bold text-amber-400">Módulo en Carga</h2>
-            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura de ingeniería industrial de IE-Pro v3.6.</p>
+            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura de ingeniería industrial de IE-Pro v3.6.1.</p>
             <button onclick="cambiarTab(1)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow transition">
                 ← Volver al Cronómetro Principal
             </button>
@@ -340,3 +340,88 @@
 
             let fila = document.createElement('tr');
             fila.className = "hover:bg-[#1f242c] transition";
+            fila.innerHTML = `
+                <td class="p-2.5 text-center font-mono">${contadorTomas}</td>
+                <td class="p-2.5 font-medium text-gray-200">${elementoSel}</td>
+                <td class="p-2.5 text-center font-mono">${ritmoVal}</td>
+                <td class="p-2.5 text-right font-mono text-amber-400 font-bold">${tiempoSeg}s</td>
+            `;
+            cuerpo.appendChild(fila);
+
+            milisegundos = 0;
+            document.getElementById('display-cronometro').innerText = "00:00.00";
+        }
+
+        function limpiarTomas() {
+            if(confirm('¿Desea limpiar todas las tomas registradas?')) {
+                listaTomas = [];
+                contadorTomas = 0;
+                document.getElementById('cuerpo-tabla').innerHTML = `<tr class="text-gray-500 text-center"><td colspan="4" class="p-4">Aún no hay tomas. Seleccioná tu elemento y presioná "Registrar Lap".</td></tr>`;
+                document.getElementById('txt-tomas').innerText = "Tomas: 0";
+                resetCronometro();
+            }
+        }
+
+        function formatearTiempo(ms) {
+            let min = Math.floor(ms / 60000);
+            let seg = Math.floor((ms % 60000) / 1000);
+            let cent = Math.floor((ms % 1000) / 10);
+            return (min < 10 ? "0" : "") + min + ":" + 
+                   (seg < 10 ? "0" : "") + seg + "." + 
+                   (cent < 10 ? "0" : "") + cent;
+        }
+
+        function descargarExcelNativo() {
+            if (typeof XLSX === 'undefined') {
+                alert('La librería de Excel se está cargando. Intente de nuevo.');
+                return;
+            }
+
+            let estudioVal = document.getElementById('input-estudio').value;
+            let operarioVal = document.getElementById('input-operario').value;
+            let taktVal = document.getElementById('input-takt').value;
+
+            let wb = XLSX.utils.book_new();
+            
+            let datos = [
+                ["IE-Pro v3.6.1 - Reporte de Estudio de Tiempos y Métodos"],
+                ["Estudio:", estudioVal],
+                ["Operario:", operarioVal],
+                ["Takt Time (s):", taktVal],
+                [""],
+                ["Toma #", "Elemento de Operación", "Ritmo OIT", "Tiempo Observado (s)"]
+            ];
+
+            if (listaTomas.length === 0) {
+                datos.push(["Sin tomas registradas aún", "", "", ""]);
+            } else {
+                listaTomas.forEach(t => {
+                    datos.push([t.toma, t.elemento, t.ritmo, parseFloat(t.tiempo)]);
+                });
+            }
+
+            let ws = XLSX.utils.aoa_to_sheet(datos);
+            XLSX.utils.book_append_sheet(wb, ws, "Estudio de Tiempos");
+
+            XLSX.writeFile(wb, "Estudio_" + estudioVal.replace(/\s+/g, '_') + ".xlsx");
+        }
+
+        function exportarJSON() {
+            let datosEstudio = {
+                estudio: document.getElementById('input-estudio').value,
+                operario: document.getElementById('input-operario').value,
+                taktTime: document.getElementById('input-takt').value,
+                elementos: elementosOperacion,
+                tomas: listaTomas
+            };
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosEstudio, null, 2));
+            let a = document.createElement('a');
+            a.href = dataStr;
+            a.download = "IE_Pro_Respaldo_Estudio.json";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
