@@ -69,22 +69,22 @@
 
         <!-- Barra de Botones de Exportación -->
         <div class="flex flex-wrap gap-2">
-            <button onclick="descargarExcelNativo()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
+            <button id="btn-excel" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
                 <span>📥</span><span>Descargar Excel Completo (.xlsx)</span>
             </button>
-            <button onclick="exportarJSON()" class="bg-[#21262d] hover:bg-[#30363d] text-gray-300 border border-[#30363d] text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
+            <button id="btn-json" class="bg-[#21262d] hover:bg-[#30363d] text-gray-300 border border-[#30363d] text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
                 <span>💾</span><span>Resp. JSON / Cargar</span>
             </button>
         </div>
 
         <!-- Pestañas de Navegación -->
         <nav class="flex overflow-x-auto space-x-1 bg-[#161b22] p-1.5 rounded-xl border border-[#30363d]">
-            <button onclick="cambiarTab(1)" id="tab-btn-1" class="bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap shadow">1. Cronómetro</button>
-            <button onclick="cambiarTab(2)" id="tab-btn-2" class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">2. Hojas/Ergo</button>
-            <button onclick="cambiarTab(3)" id="tab-btn-3" class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">3. Suplementos</button>
-            <button onclick="cambiarTab(4)" id="tab-btn-4" class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">4. Multitarea</button>
-            <button onclick="cambiarTab(5)" id="tab-btn-5" class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">5. Costos/Takt</button>
-            <button onclick="cambiarTab(6)" id="tab-btn-6" class="text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">6. Dashboard</button>
+            <button data-tab="1" class="tab-btn bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap shadow">1. Cronómetro</button>
+            <button data-tab="2" class="tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">2. Hojas/Ergo</button>
+            <button data-tab="3" class="tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">3. Suplementos</button>
+            <button data-tab="4" class="tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">4. Multitarea</button>
+            <button data-tab="5" class="tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">5. Costos/Takt</button>
+            <button data-tab="6" class="tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition">6. Dashboard</button>
         </nav>
 
         <!-- SECCIÓN 1: CRONÓMETRO Y GESTOR DE ELEMENTOS -->
@@ -105,9 +105,9 @@
                     </div>
 
                     <div class="flex gap-2">
-                        <button onclick="toggleCronometro()" id="btn-iniciar" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition">▶ Iniciar / Parar</button>
-                        <button onclick="registrarLap()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition">⏱ Registrar Lap</button>
-                        <button onclick="resetCronometro()" class="bg-[#21262d] hover:bg-red-900/50 text-gray-300 border border-[#30363d] text-xs px-3 py-2.5 rounded-lg shadow transition">🔄</button>
+                        <button id="btn-iniciar" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition">▶ Iniciar / Parar</button>
+                        <button id="btn-lap" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition">⏱ Registrar Lap</button>
+                        <button id="btn-reset" class="bg-[#21262d] hover:bg-red-900/50 text-gray-300 border border-[#30363d] text-xs px-3 py-2.5 rounded-lg shadow transition">🔄</button>
                     </div>
 
                     <div class="flex justify-between text-xs text-gray-400 px-1 font-mono">
@@ -131,7 +131,7 @@
                             <span>VALORACIÓN DEL RITMO (OIT %):</span>
                             <span id="ritmo-val" class="bg-[#0b0f19] border border-[#30363d] px-2 py-0.5 rounded text-amber-400 font-mono">100 %</span>
                         </div>
-                        <input type="range" id="range-ritmo" min="50" max="150" value="100" oninput="actualizarRitmo(this.value)" class="w-full accent-blue-600 bg-[#0b0f19] rounded-lg h-2 cursor-pointer">
+                        <input type="range" id="range-ritmo" min="50" max="150" value="100" class="w-full accent-blue-600 bg-[#0b0f19] rounded-lg h-2 cursor-pointer">
                     </div>
                 </div>
 
@@ -145,7 +145,7 @@
                                 <option value="Manual">Manual</option>
                                 <option value="Máquina">Máquina</option>
                             </select>
-                            <button onclick="agregarElementoPersonalizado()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 rounded-lg shadow transition">
+                            <button id="btn-agregar-elem" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 rounded-lg shadow transition">
                                 Añadir a la lista
                             </button>
                         </div>
@@ -165,7 +165,7 @@
                                 <p class="text-[11px] text-gray-400">Tiempos Observados (To) y Valoración OIT por Ciclo</p>
                             </div>
                         </div>
-                        <button onclick="limpiarTomas()" class="bg-red-900/40 hover:bg-red-900/70 text-red-300 border border-red-700/50 text-xs font-semibold px-3 py-1.5 rounded-lg shadow transition">
+                        <button id="btn-limpiar-tomas" class="bg-red-900/40 hover:bg-red-900/70 text-red-300 border border-red-700/50 text-xs font-semibold px-3 py-1.5 rounded-lg shadow transition">
                             🗑 Limpiar Tomas
                         </button>
                     </div>
@@ -195,14 +195,14 @@
         <div id="seccion-contenido-extra" class="hidden app-card p-6 rounded-xl shadow-lg space-y-4 text-center">
             <h2 id="titulo-seccion-activa" class="text-lg font-bold text-amber-400">Módulo en Carga</h2>
             <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura de ingeniería industrial de IE-Pro v3.6.3.</p>
-            <button onclick="cambiarTab(1)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow transition">
+            <button id="btn-volver-cronometro" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow transition">
                 ← Volver al Cronómetro Principal
             </button>
         </div>
 
     </div>
 
-    <!-- Script de Gestión Completa -->
+    <!-- Script de Gestión Completa con Asignación Segura de Eventos -->
     <script>
         let timerInterval = null;
         let milisegundos = 0;
@@ -216,9 +216,29 @@
             { id: 3, nombre: "3. Ciclo de Prueba Automático", tipo: "Máquina" }
         ];
 
-        window.onload = function() {
+        document.addEventListener('DOMContentLoaded', function() {
             actualizarSelectElementos();
-        };
+
+            // Enlace seguro de botones
+            document.getElementById('btn-iniciar').addEventListener('click', toggleCronometro);
+            document.getElementById('btn-lap').addEventListener('click', registrarLap);
+            document.getElementById('btn-reset').addEventListener('click', resetCronometro);
+            document.getElementById('btn-agregar-elem').addEventListener('click', agregarElementoPersonalizado);
+            document.getElementById('btn-limpiar-tomas').addEventListener('click', limpiarTomas);
+            document.getElementById('btn-excel').addEventListener('click', descargarExcelNativo);
+            document.getElementById('btn-json').addEventListener('click', exportarJSON);
+            document.getElementById('btn-volver-cronometro').addEventListener('click', () => cambiarTab(1));
+
+            document.getElementById('range-ritmo').addEventListener('input', function(e) {
+                actualizarRitmo(e.target.value);
+            });
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    cambiarTab(parseInt(this.getAttribute('data-tab')));
+                });
+            });
+        });
 
         function actualizarSelectElementos() {
             let select = document.getElementById('select-elemento');
@@ -247,3 +267,181 @@
                 nombre: `${nuevoId}. ${nombreVal}`,
                 tipo: selectTipo.value
             });
+
+            inputNombre.value = "";
+            actualizarSelectElementos();
+        }
+
+        function actualizarRitmo(val) {
+            document.getElementById('ritmo-val').innerText = val + ' %';
+        }
+
+        function cambiarTab(num) {
+            document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+                let tabNum = idx + 1;
+                if(tabNum === num) {
+                    btn.className = "tab-btn bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap shadow";
+                } else {
+                    btn.className = "tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition";
+                }
+            });
+
+            const secCronometro = document.getElementById('seccion-1');
+            const secExtra = document.getElementById('seccion-contenido-extra');
+            const tituloExtra = document.getElementById('titulo-seccion-activa');
+
+            if(num === 1) {
+                secCronometro.classList.remove('hidden');
+                secExtra.classList.add('hidden');
+            } else {
+                secCronometro.classList.add('hidden');
+                secExtra.classList.remove('hidden');
+                const nombresTabs = ["", "1. Cronómetro", "2. Hojas de Proceso / Ergonomía", "3. Suplementos y Tolerancias", "4. Línea de Balance / Multitarea", "5. Análisis de Costos y Takt Time", "6. Dashboard de Productividad"];
+                tituloExtra.innerText = nombresTabs[num];
+            }
+        }
+
+        function toggleCronometro() {
+            const btn = document.getElementById('btn-iniciar');
+            if (!estaCorriendo) {
+                estaCorriendo = true;
+                btn.innerText = "⏸ Pausar";
+                btn.className = "flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition";
+                let inicioTiempo = Date.now() - milisegundos;
+                timerInterval = setInterval(() => {
+                    milisegundos = Date.now() - inicioTiempo;
+                    document.getElementById('display-cronometro').innerText = formatearTiempo(milisegundos);
+                }, 10);
+            } else {
+                pausarCronometro();
+            }
+        }
+
+        function pausarCronometro() {
+            estaCorriendo = false;
+            clearInterval(timerInterval);
+            const btn = document.getElementById('btn-iniciar');
+            btn.innerText = "▶ Reanudar";
+            btn.className = "flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition";
+        }
+
+        function resetCronometro() {
+            pausarCronometro();
+            milisegundos = 0;
+            document.getElementById('display-cronometro').innerText = "00:00.00";
+            document.getElementById('txt-acumulado').innerText = "00:00.00";
+            document.getElementById('txt-lap').innerText = "00:00.00";
+            const btn = document.getElementById('btn-iniciar');
+            btn.innerText = "▶ Iniciar / Parar";
+        }
+
+        function registrarLap() {
+            if (milisegundos === 0) return;
+
+            contadorTomas++;
+            let tiempoActualStr = formatearTiempo(milisegundos);
+            let elementoSel = document.getElementById('select-elemento').value;
+            let ritmoVal = document.getElementById('range-ritmo').value + "%";
+            let tiempoSeg = (milisegundos / 1000).toFixed(2);
+
+            listaTomas.push({
+                toma: contadorTomas,
+                elemento: elementoSel,
+                ritmo: ritmoVal,
+                tiempo: tiempoSeg
+            });
+
+            document.getElementById('txt-lap').innerText = tiempoActualStr;
+            document.getElementById('txt-acumulado').innerText = tiempoActualStr;
+            document.getElementById('txt-tomas').innerText = "Tomas: " + contadorTomas;
+
+            let cuerpo = document.getElementById('cuerpo-tabla');
+            if (contadorTomas === 1) cuerpo.innerHTML = "";
+
+            let fila = document.createElement('tr');
+            fila.className = "hover:bg-[#1f242c] transition";
+            fila.innerHTML = `
+                <td class="p-2.5 text-center font-mono">${contadorTomas}</td>
+                <td class="p-2.5 font-medium text-gray-200">${elementoSel}</td>
+                <td class="p-2.5 text-center font-mono">${ritmoVal}</td>
+                <td class="p-2.5 text-right font-mono text-amber-400 font-bold">${tiempoSeg}s</td>
+            `;
+            cuerpo.appendChild(fila);
+
+            milisegundos = 0;
+            document.getElementById('display-cronometro').innerText = "00:00.00";
+        }
+
+        function limpiarTomas() {
+            if(confirm('¿Desea limpiar todas las tomas registradas?')) {
+                listaTomas = [];
+                contadorTomas = 0;
+                document.getElementById('cuerpo-tabla').innerHTML = `<tr class="text-gray-500 text-center"><td colspan="4" class="p-4">Aún no hay tomas. Seleccioná tu elemento y presioná "Registrar Lap".</td></tr>`;
+                document.getElementById('txt-tomas').innerText = "Tomas: 0";
+                resetCronometro();
+            }
+        }
+
+        function formatearTiempo(ms) {
+            let min = Math.floor(ms / 60000);
+            let seg = Math.floor((ms % 60000) / 1000);
+            let cent = Math.floor((ms % 1000) / 10);
+            return (min < 10 ? "0" : "") + min + ":" + 
+                   (seg < 10 ? "0" : "") + seg + "." + 
+                   (cent < 10 ? "0" : "") + cent;
+        }
+
+        function descargarExcelNativo() {
+            if (typeof XLSX === 'undefined') {
+                alert('La librería de Excel se está cargando. Intente de nuevo.');
+                return;
+            }
+
+            let estudioVal = document.getElementById('input-estudio').value;
+            let operarioVal = document.getElementById('input-operario').value;
+            let taktVal = document.getElementById('input-takt').value;
+
+            let wb = XLSX.utils.book_new();
+            
+            let datos = [
+                ["IE-Pro v3.6.3 - Reporte de Estudio de Tiempos y Métodos"],
+                ["Estudio:", estudioVal],
+                ["Operario:", operarioVal],
+                ["Takt Time (s):", taktVal],
+                [""],
+                ["Toma #", "Elemento de Operación", "Ritmo OIT", "Tiempo Observado (s)"]
+            ];
+
+            if (listaTomas.length === 0) {
+                datos.push(["Sin tomas registradas aún", "", "", ""]);
+            } else {
+                listaTomas.forEach(t => {
+                    datos.push([t.toma, t.elemento, t.ritmo, parseFloat(t.tiempo)]);
+                });
+            }
+
+            let ws = XLSX.utils.aoa_to_sheet(datos);
+            XLSX.utils.book_append_sheet(wb, ws, "Estudio de Tiempos");
+
+            XLSX.writeFile(wb, "Estudio_" + estudioVal.replace(/\s+/g, '_') + ".xlsx");
+        }
+
+        function exportarJSON() {
+            let datosEstudio = {
+                estudio: document.getElementById('input-estudio').value,
+                operario: document.getElementById('input-operario').value,
+                taktTime: document.getElementById('input-takt').value,
+                elementos: elementosOperacion,
+                tomas: listaTomas
+            };
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosEstudio, null, 2));
+            let a = document.createElement('a');
+            a.href = dataStr;
+            a.download = "IE_Pro_Respaldo_Estudio.json";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
