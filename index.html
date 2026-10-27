@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- v3.7.6-sync-logic -->
+<!DOCTYPE html><!-- v3.7.7-fix-pause-sync -->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -17,7 +17,7 @@
     </script>
 
     <!-- Vinculación del Manifiesto e Ícono Personalizado -->
-    <link rel="manifest" href="./manifest.json?v=376">
+    <link rel="manifest" href="./manifest.json?v=377">
     <link rel="icon" type="image/png" sizes="512x512" href="./app.png">
     <link rel="apple-touch-icon" sizes="512x512" href="./app.png">
 
@@ -57,7 +57,7 @@
                 <div>
                     <div class="flex items-center space-x-2">
                         <h1 class="text-xl font-bold tracking-wide">IE-Pro</h1>
-                        <span class="bg-emerald-600/30 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/30 font-semibold">Sheets v3.7.6</span>
+                        <span class="bg-emerald-600/30 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/30 font-semibold">Sheets v3.7.7</span>
                     </div>
                     <p class="text-xs text-gray-400">Ingeniería Industrial & Métodos y Tiempos</p>
                 </div>
@@ -221,7 +221,7 @@
         <!-- SECCIONES EXTRAS -->
         <div id="seccion-contenido-extra" class="hidden app-card p-6 rounded-xl shadow-lg space-y-4 text-center">
             <h2 id="titulo-seccion-activa" class="text-lg font-bold text-amber-400">Módulo en Carga</h2>
-            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura industrial de IE-Pro v3.7.6.</p>
+            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura industrial de IE-Pro v3.7.7.</p>
             <button onclick="cambiarTab(1)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow transition">
                 ← Volver al Cronómetro Principal
             </button>
@@ -292,16 +292,16 @@
                 let fila = document.createElement('tr');
                 fila.className = "hover:bg-[#1f242c] transition";
                 fila.innerHTML = `
-                    <td class="p-2.5 font-medium text-gray-200">${el.nombre}</td>
-                    <td class="p-2.5 text-center"><span class="bg-[#21262d] text-gray-300 text-[10px] px-2 py-0.5 rounded border border-[#30363d]">${el.tipo}</span></td>
-                    <td class="p-2.5 text-center font-mono">${nTomas}</td>
-                    <td class="p-2.5 text-right font-mono text-gray-200">${promedioTo.toFixed(2)}s</td>
+                    <td class="p-2.5 font-medium text-gray-200">\${el.nombre}</td>
+                    <td class="p-2.5 text-center"><span class="bg-[#21262d] text-gray-300 text-[10px] px-2 py-0.5 rounded border border-[#30363d]">\${el.tipo}</span></td>
+                    <td class="p-2.5 text-center font-mono">\${nTomas}</td>
+                    <td class="p-2.5 text-right font-mono text-gray-200">\${promedioTo.toFixed(2)}s</td>
                     <td class="p-2.5 text-center font-mono">
                         <input type="number" value="${el.ritmo}" onchange="cambiarRitmoElemento(${index}, this.value)" class="w-14 bg-[#0b0f19] border border-[#30363d] text-center text-amber-400 rounded py-0.5 text-xs focus:outline-none focus:border-blue-500">
                     </td>
-                    <td class="p-2.5 text-right font-mono text-amber-400 font-bold">${tb}s</td>
+                    <td class="p-2.5 text-right font-mono text-amber-400 font-bold">\${tb}s</td>
                     <td class="p-2.5 text-center">
-                        <button onclick="limpiarTomasElemento(${index})" class="bg-red-900/40 hover:bg-red-900/70 text-red-300 px-2 py-1 rounded text-xs transition" title="Limpiar Tomas">🗑</button>
+                        <button onclick="limpiarTomasElemento(\${index})" class="bg-red-900/40 hover:bg-red-900/70 text-red-300 px-2 py-1 rounded text-xs transition" title="Limpiar Tomas">🗑</button>
                     </td>
                 `;
                 cuerpo.appendChild(fila);
@@ -315,204 +315,4 @@
         }
 
         function limpiarTomasElemento(index) {
-            if(confirm(`¿Desea borrar las tomas de "${elementosEstudio[index].nombre}"?`)) {
-                elementosEstudio[index].tomas = [];
-                renderizarTablaElementos();
-                recalcularTotales();
-            }
-        }
-
-        function abrirModalNuevoElemento() {
-            let nombre = prompt("Ingrese el nombre del nuevo elemento:");
-            if (!nombre) return;
-            let tipo = prompt("Tipo (Manual / Máquina):", "Manual");
-            
-            elementosEstudio.push({
-                id: elementosEstudio.length + 1,
-                nombre: `${elementosEstudio.length + 1}. ${nombre}`,
-                tipo: tipo || "Manual",
-                tomas: [],
-                ritmo: 100
-            });
-
-            actualizarSelectElementos();
-            renderizarTablaElementos();
-            recalcularTotales();
-        }
-
-        function recalcularTotales() {
-            let sumaPromediosTo = 0;
-            elementosEstudio.forEach(el => {
-                sumaPromediosTo += calcularPromedio(el.tomas);
-            });
-
-            if(!estaCorriendoCiclo && cicloAcumuladoPausa === 0) {
-                document.getElementById('txt-ciclo-total').innerText = sumaPromediosTo.toFixed(2);
-            }
-            document.getElementById('txt-suma-to').innerText = sumaPromediosTo.toFixed(2) + " s";
-
-            let taktInput = document.getElementById('input-takt').value.replace('s', '').trim();
-            let taktVal = parseFloat(taktInput) || 48.04;
-            let diferencia = taktVal - sumaPromediosTo;
-            let porcentajeMedido = taktVal > 0 ? ((sumaPromediosTo / taktVal) * 100).toFixed(1) : 0;
-
-            let textoRemanente = diferencia >= 0 
-                ? `+${diferencia.toFixed(2)} s lib. (${porcentajeMedido}% medido)` 
-                : `${diferencia.toFixed(2)} s sobre Takt`;
-            
-            document.getElementById('txt-remanente').innerText = textoRemanente;
-        }
-
-        // CONTROL DE CICLO TOTAL (Al iniciar, arranca ambos; al pausar, detiene ambos)
-        function toggleCronometroCiclo() {
-            const btn = document.getElementById('b-ciclo-start');
-            if (!estaCorriendoCiclo) {
-                estaCorriendoCiclo = true;
-                btn.innerText = "⏸ Pausar";
-                btn.className = "bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-lg shadow transition";
-                
-                cicloInicio = Date.now() - cicloAcumuladoPausa;
-                cicloInterval = setInterval(() => {
-                    let transcurrido = Date.now() - cicloInicio;
-                    document.getElementById('txt-ciclo-total').innerText = (transcurrido / 1000).toFixed(2);
-                }, 10);
-
-                // Arranca también el cronómetro elemental si estaba detenido
-                if (!estaCorriendo) {
-                    toggleCronometro();
-                }
-            } else {
-                // Pausa el ciclo total Y TAMBIÉN pausa el cronómetro elemental
-                pausarCronometroCiclo();
-                if (estaCorriendo) {
-                    pausarCronometro();
-                }
-            }
-        }
-
-        function pausarCronometroCiclo() {
-            if (!estaCorriendoCiclo) return;
-            estaCorriendoCiclo = false;
-            clearInterval(cicloInterval);
-            cicloAcumuladoPausa = Date.now() - cicloInicio;
-            const btn = document.getElementById('b-ciclo-start');
-            btn.innerText = "▶ Reanudar";
-            btn.className = "bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg shadow transition";
-        }
-
-        function resetCronometroCiclo() {
-            pausarCronometroCiclo();
-            cicloAcumuladoPausa = 0;
-            cicloInicio = 0;
-            const btn = document.getElementById('b-ciclo-start');
-            btn.innerText = "▶ Iniciar";
-            recalcularTotales();
-        }
-
-        function actualizarRitmo(val) {
-            document.getElementById('ritmo-val').innerText = val + ' %';
-            let indexSel = document.getElementById('select-elemento').value;
-            if(elementosEstudio[indexSel]) {
-                elementosEstudio[indexSel].ritmo = parseInt(val);
-                renderizarTablaElementos();
-                recalcularTotales();
-            }
-        }
-
-        function actualizarSeleccionActiva() {
-            let indexSel = document.getElementById('select-elemento').value;
-            if(elementosEstudio[indexSel]) {
-                document.getElementById('range-ritmo').value = elementosEstudio[indexSel].ritmo;
-                document.getElementById('ritmo-val').innerText = elementosEstudio[indexSel].ritmo + ' %';
-            }
-        }
-
-        function cambiarTab(num) {
-            for(let i=1; i<=6; i++) {
-                let btn = document.getElementById('tab-btn-' + i);
-                if(btn) {
-                    if(i === num) {
-                        btn.className = "tab-btn bg-blue-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap shadow";
-                    } else {
-                        btn.className = "tab-btn text-gray-400 hover:text-gray-200 text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap transition";
-                    }
-                }
-            }
-
-            const secCronometro = document.getElementById('seccion-1');
-            const secExtra = document.getElementById('seccion-contenido-extra');
-            const tituloExtra = document.getElementById('titulo-seccion-activa');
-
-            if(num === 1) {
-                secCronometro.classList.remove('hidden');
-                secExtra.classList.add('hidden');
-            } else {
-                secCronometro.classList.add('hidden');
-                secExtra.classList.remove('hidden');
-                const nombresTabs = ["", "1. Cronómetro", "2. Hojas de Proceso / Ergonomía", "3. Suplementos y Tolerancias", "4. Línea de Balance / Multitarea", "5. Análisis de Costos y Takt Time", "6. Dashboard de Productividad"];
-                tituloExtra.innerText = nombresTabs[num];
-            }
-        }
-
-        // CONTROL ELEMENTAL (Al pausar este, el ciclo total SIGUE CORRIENDO libremente)
-        function toggleCronometro() {
-            const btn = document.getElementById('b-start');
-            if (!estaCorriendo) {
-                estaCorriendo = true;
-                btn.innerText = "⏸ Pausar";
-                btn.className = "flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition";
-                
-                tiempoInicioElemento = Date.now() - acumuladoPausaElemento;
-                timerInterval = setInterval(() => {
-                    let transcurridoElemento = Date.now() - tiempoInicioElemento;
-                    document.getElementById('display-cronometro').innerText = formatearTiempo(transcurridoElemento);
-                    
-                    let acumuladoVisual = tiempoAcumuladoGeneralMs + transcurridoElemento;
-                    document.getElementById('txt-acumulado').innerText = formatearTiempo(acumuladoVisual);
-                }, 10);
-            } else {
-                pausarCronometro();
-            }
-        }
-
-        function pausarCronometro() {
-            if (!estaCorriendo) return;
-            estaCorriendo = false;
-            clearInterval(timerInterval);
-            acumuladoPausaElemento = Date.now() - tiempoInicioElemento;
-            const btn = document.getElementById('b-start');
-            btn.innerText = "▶ Reanudar";
-            btn.className = "flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition";
-        }
-
-        function resetCronometro() {
-            if(confirm("¿Desea reiniciar el cronómetro y borrar todas las tomas de los elementos?")) {
-                pausarCronometro();
-                acumuladoPausaElemento = 0;
-                tiempoInicioElemento = 0;
-                tiempoAcumuladoGeneralMs = 0;
-                contadorTomasTotales = 0;
-                
-                document.getElementById('display-cronometro').innerText = "00:00.00";
-                document.getElementById('txt-acumulado').innerText = "00:00.00";
-                document.getElementById('txt-lap').innerText = "00:00.00";
-                document.getElementById('txt-tomas').innerText = "Tomas: 0";
-                
-                const btn = document.getElementById('b-start');
-                btn.innerText = "▶ Iniciar / Parar";
-
-                elementosEstudio.forEach(el => {
-                    el.tomas = [];
-                });
-
-                renderizarTablaElementos();
-                recalcularTotales();
-            }
-        }
-
-        function registrarLap() {
-            let ahora = Date.now();
-            if (!estaCorriendo) return;
-
-            let tiempoObservadoMs = ahora - tiempoInicioElemento;
-            if (
+            if(confirm(`¿Desea
