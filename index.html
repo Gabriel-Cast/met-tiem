@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- v3.7.1-reset-tomas -->
+<!DOCTYPE html><!-- v3.7.3-sheets-final -->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -17,7 +17,7 @@
     </script>
 
     <!-- Vinculación del Manifiesto e Ícono Personalizado -->
-    <link rel="manifest" href="./manifest.json?v=371">
+    <link rel="manifest" href="./manifest.json?v=373">
     <link rel="icon" type="image/png" sizes="512x512" href="./app.png">
     <link rel="apple-touch-icon" sizes="512x512" href="./app.png">
 
@@ -57,7 +57,7 @@
                 <div>
                     <div class="flex items-center space-x-2">
                         <h1 class="text-xl font-bold tracking-wide">IE-Pro</h1>
-                        <span class="bg-emerald-600/30 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/30 font-semibold">Sheets v3.7.1</span>
+                        <span class="bg-emerald-600/30 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/30 font-semibold">Sheets v3.7.3</span>
                     </div>
                     <p class="text-xs text-gray-400">Ingeniería Industrial & Métodos y Tiempos</p>
                 </div>
@@ -221,7 +221,7 @@
         <!-- SECCIONES EXTRAS -->
         <div id="seccion-contenido-extra" class="hidden app-card p-6 rounded-xl shadow-lg space-y-4 text-center">
             <h2 id="titulo-seccion-activa" class="text-lg font-bold text-amber-400">Módulo en Carga</h2>
-            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura industrial de IE-Pro v3.7.1.</p>
+            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura industrial de IE-Pro v3.7.3.</p>
             <button onclick="cambiarTab(1)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow transition">
                 ← Volver al Cronómetro Principal
             </button>
@@ -229,7 +229,7 @@
 
     </div>
 
-    <!-- Script Actualizado -->
+    <!-- Script Actualizado con Nueva URL y Ciclo Total -->
     <script>
         let timerInterval = null;
         let tiempoInicioElemento = 0;
@@ -312,7 +312,6 @@
             recalcularTotales();
         }
 
-        // Limpia SOLO las tomas de un elemento específico sin borrar su nombre
         function limpiarTomasElemento(index) {
             if(confirm(`¿Desea borrar todas las tomas del elemento "${elementosEstudio[index].nombre}"?`)) {
                 elementosEstudio[index].tomas = [];
@@ -473,7 +472,6 @@
             btn.className = "flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow transition";
         }
 
-        // --- REINICIA EL CRONÓMETRO Y TODAS LAS TOMAS DE LOS ELEMENTOS SIN BORRAR SUS NOMBRES ---
         function resetCronometro() {
             if(confirm("¿Desea reiniciar el cronómetro y borrar todas las tomas registradas de los elementos?")) {
                 pausarCronometro();
@@ -482,117 +480,4 @@
                 tiempoAcumuladoGeneralMs = 0;
                 contadorTomasTotales = 0;
                 
-                document.getElementById('display-cronometro').innerText = "00:00.00";
-                document.getElementById('txt-acumulado').innerText = "00:00.00";
-                document.getElementById('txt-lap').innerText = "00:00.00";
-                document.getElementById('txt-tomas').innerText = "Tomas: 0";
-                
-                const btn = document.getElementById('b-start');
-                btn.innerText = "▶ Iniciar / Parar";
-
-                // Vacía las tomas de cada elemento manteniendo sus nombres intactos
-                elementosEstudio.forEach(el => {
-                    el.tomas = [];
-                });
-
-                renderizarTablaElementos();
-                recalcularTotales();
-            }
-        }
-
-        function registrarLap() {
-            let ahora = Date.now();
-            if (!estaCorriendo) return;
-
-            let tiempoObservadoMs = ahora - tiempoInicioElemento;
-            if (tiempoObservadoMs < 50) return;
-
-            let tiempoSeg = parseFloat((tiempoObservadoMs / 1000).toFixed(2));
-            contadorTomasTotales++;
-            tiempoAcumuladoGeneralMs += tiempoObservadoMs;
-
-            let selectEl = document.getElementById('select-elemento');
-            let indexSel = parseInt(selectEl.value);
-
-            if(!isNaN(indexSel) && elementosEstudio[indexSel]) {
-                elementosEstudio[indexSel].tomas.push(tiempoSeg);
-                renderizarTablaElementos();
-                recalcularTotales();
-                
-                let siguienteIndex = (indexSel + 1) % elementosEstudio.length;
-                selectEl.value = siguienteIndex;
-                actualizarSeleccionActiva();
-            }
-
-            document.getElementById('txt-lap').innerText = formatearTiempo(tiempoObservadoMs);
-            document.getElementById('txt-acumulado').innerText = formatearTiempo(tiempoAcumuladoGeneralMs);
-            document.getElementById('txt-tomas').innerText = "Tomas: " + contadorTomasTotales;
-
-            tiempoInicioElemento = Date.now();
-            document.getElementById('display-cronometro').innerText = "00:00.00";
-        }
-
-        function formatearTiempo(ms) {
-            let min = Math.floor(ms / 60000);
-            let seg = Math.floor((ms % 60000) / 1000);
-            let cent = Math.floor((ms % 1000) / 10);
-            return (min < 10 ? "0" : "") + min + ":" + 
-                   (seg < 10 ? "0" : "") + seg + "." + 
-                   (cent < 10 ? "0" : "") + cent;
-        }
-
-        // --- FUNCIÓN DE ENVÍO DIRECTO A GOOGLE SHEETS ---
-        function enviarAGoogleSheets() {
-            const urlGoogleScript = "https://script.google.com/macros/s/AKfycbxv2sVaH2P5v5s3Ykv7KTrbVi038VG8gvvrGdbtCo6tLhTKUfcRsMXB4ink3kCZStXISg/exec";
-
-            let datosEstudio = {
-                estudio: document.getElementById('input-estudio').value,
-                operario: document.getElementById('input-operario').value,
-                taktTime: document.getElementById('input-takt').value,
-                elementos: elementosEstudio
-            };
-
-            let btnOriginal = document.querySelector('button[onclick="enviarAGoogleSheets()"]');
-            let textoAntiguo = btnOriginal.innerHTML;
-            btnOriginal.innerHTML = "<span>⏳</span><span>Enviando a la nube...</span>";
-            btnOriginal.disabled = true;
-
-            fetch(urlGoogleScript, {
-                method: "POST",
-                mode: "no-cors",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(datosEstudio)
-            })
-            .then(() => {
-                alert("¡Estudio enviado y registrado en Google Sheets con éxito!");
-                btnOriginal.innerHTML = textoAntiguo;
-                btnOriginal.disabled = false;
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("Hubo un error al enviar los datos a Google Sheets.");
-                btnOriginal.innerHTML = textoAntiguo;
-                btnOriginal.disabled = false;
-            });
-        }
-
-        function exportarJSON() {
-            let datosEstudio = {
-                estudio: document.getElementById('input-estudio').value,
-                operario: document.getElementById('input-operario').value,
-                taktTime: document.getElementById('input-takt').value,
-                elementos: elementosEstudio
-            };
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosEstudio, null, 2));
-            let a = document.createElement('a');
-            a.href = dataStr;
-            a.download = "IE_Pro_Respaldo_Estudio.json";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-    </script>
-</body>
-</html>
+                document.getElementById
