@@ -528,13 +528,7 @@
 
         // --- FUNCIÓN DE ENVÍO DIRECTO A GOOGLE SHEETS ---
         function enviarAGoogleSheets() {
-            // PEGA AQUÍ ABAJO LA URL DE TU APLICACIÓN WEB DE APPS SCRIPT
-            const urlGoogleScript = "https://script.google.com/macros/s/TU_URL_DE_APPS_SCRIPT_AQUI/exec";
-
-            if(urlGoogleScript.includes("TU_URL_DE_APPS_SCRIPT")) {
-                alert("Por favor, configura la URL de tu Google Apps Script en el código JS de la app.");
-                return;
-            }
+            const urlGoogleScript = "https://script.google.com/macros/s/AKfycbxv2sVaH2P5v5s3Ykv7KTrbVi038VG8gvvrGdbtCo6tLhTKUfcRsMXB4ink3kCZStXISg/exec";
 
             let datosEstudio = {
                 estudio: document.getElementById('input-estudio').value,
@@ -543,7 +537,6 @@
                 elementos: elementosEstudio
             };
 
-            // Mostrar aviso visual de carga
             let btnOriginal = document.querySelector('button[onclick="enviarAGoogleSheets()"]');
             let textoAntiguo = btnOriginal.innerHTML;
             btnOriginal.innerHTML = "<span>⏳</span><span>Enviando a la nube...</span>";
@@ -551,7 +544,7 @@
 
             fetch(urlGoogleScript, {
                 method: "POST",
-                mode: "no-cors", // Requerido para evitar bloqueos CORS con Google Scripts
+                mode: "no-cors",
                 headers: {
                     "Content-Type": "application/json"
                 },
