@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- v3.7.4-fixed -->
+<!DOCTYPE html><!-- v3.7.5-sync-timers -->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -17,7 +17,7 @@
     </script>
 
     <!-- Vinculación del Manifiesto e Ícono Personalizado -->
-    <link rel="manifest" href="./manifest.json?v=374">
+    <link rel="manifest" href="./manifest.json?v=375">
     <link rel="icon" type="image/png" sizes="512x512" href="./app.png">
     <link rel="apple-touch-icon" sizes="512x512" href="./app.png">
 
@@ -57,7 +57,7 @@
                 <div>
                     <div class="flex items-center space-x-2">
                         <h1 class="text-xl font-bold tracking-wide">IE-Pro</h1>
-                        <span class="bg-emerald-600/30 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/30 font-semibold">Sheets v3.7.4</span>
+                        <span class="bg-emerald-600/30 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/30 font-semibold">Sheets v3.7.5</span>
                     </div>
                     <p class="text-xs text-gray-400">Ingeniería Industrial & Métodos y Tiempos</p>
                 </div>
@@ -221,7 +221,7 @@
         <!-- SECCIONES EXTRAS -->
         <div id="seccion-contenido-extra" class="hidden app-card p-6 rounded-xl shadow-lg space-y-4 text-center">
             <h2 id="titulo-seccion-activa" class="text-lg font-bold text-amber-400">Módulo en Carga</h2>
-            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura industrial de IE-Pro v3.7.4.</p>
+            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura industrial de IE-Pro v3.7.5.</p>
             <button onclick="cambiarTab(1)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow transition">
                 ← Volver al Cronómetro Principal
             </button>
@@ -363,6 +363,7 @@
             document.getElementById('txt-remanente').innerText = textoRemanente;
         }
 
+        // FUNCIÓN MODIFICADA: Ahora arranca también el cronómetro elemental si no estaba corriendo
         function toggleCronometroCiclo() {
             const btn = document.getElementById('b-ciclo-start');
             if (!estaCorriendoCiclo) {
@@ -375,6 +376,11 @@
                     let transcurrido = Date.now() - cicloInicio;
                     document.getElementById('txt-ciclo-total').innerText = (transcurrido / 1000).toFixed(2);
                 }, 10);
+
+                // Si el cronómetro de tiempos elementales no estaba corriendo, lo inicia en simultáneo
+                if (!estaCorriendo) {
+                    toggleCronometro();
+                }
             } else {
                 pausarCronometroCiclo();
             }
