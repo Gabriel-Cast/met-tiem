@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- v3.7.5-sync-timers -->
+<!DOCTYPE html><!-- v3.7.6-sync-logic -->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -17,7 +17,7 @@
     </script>
 
     <!-- Vinculación del Manifiesto e Ícono Personalizado -->
-    <link rel="manifest" href="./manifest.json?v=375">
+    <link rel="manifest" href="./manifest.json?v=376">
     <link rel="icon" type="image/png" sizes="512x512" href="./app.png">
     <link rel="apple-touch-icon" sizes="512x512" href="./app.png">
 
@@ -57,7 +57,7 @@
                 <div>
                     <div class="flex items-center space-x-2">
                         <h1 class="text-xl font-bold tracking-wide">IE-Pro</h1>
-                        <span class="bg-emerald-600/30 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/30 font-semibold">Sheets v3.7.5</span>
+                        <span class="bg-emerald-600/30 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/30 font-semibold">Sheets v3.7.6</span>
                     </div>
                     <p class="text-xs text-gray-400">Ingeniería Industrial & Métodos y Tiempos</p>
                 </div>
@@ -221,7 +221,7 @@
         <!-- SECCIONES EXTRAS -->
         <div id="seccion-contenido-extra" class="hidden app-card p-6 rounded-xl shadow-lg space-y-4 text-center">
             <h2 id="titulo-seccion-activa" class="text-lg font-bold text-amber-400">Módulo en Carga</h2>
-            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura industrial de IE-Pro v3.7.5.</p>
+            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura industrial de IE-Pro v3.7.6.</p>
             <button onclick="cambiarTab(1)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow transition">
                 ← Volver al Cronómetro Principal
             </button>
@@ -363,7 +363,7 @@
             document.getElementById('txt-remanente').innerText = textoRemanente;
         }
 
-        // FUNCIÓN MODIFICADA: Ahora arranca también el cronómetro elemental si no estaba corriendo
+        // CONTROL DE CICLO TOTAL (Al iniciar, arranca ambos; al pausar, detiene ambos)
         function toggleCronometroCiclo() {
             const btn = document.getElementById('b-ciclo-start');
             if (!estaCorriendoCiclo) {
@@ -377,12 +377,16 @@
                     document.getElementById('txt-ciclo-total').innerText = (transcurrido / 1000).toFixed(2);
                 }, 10);
 
-                // Si el cronómetro de tiempos elementales no estaba corriendo, lo inicia en simultáneo
+                // Arranca también el cronómetro elemental si estaba detenido
                 if (!estaCorriendo) {
                     toggleCronometro();
                 }
             } else {
+                // Pausa el ciclo total Y TAMBIÉN pausa el cronómetro elemental
                 pausarCronometroCiclo();
+                if (estaCorriendo) {
+                    pausarCronometro();
+                }
             }
         }
 
@@ -450,6 +454,7 @@
             }
         }
 
+        // CONTROL ELEMENTAL (Al pausar este, el ciclo total SIGUE CORRIENDO libremente)
         function toggleCronometro() {
             const btn = document.getElementById('b-start');
             if (!estaCorriendo) {
@@ -510,97 +515,4 @@
             if (!estaCorriendo) return;
 
             let tiempoObservadoMs = ahora - tiempoInicioElemento;
-            if (tiempoObservadoMs < 50) return;
-
-            let tiempoSeg = parseFloat((tiempoObservadoMs / 1000).toFixed(2));
-            contadorTomasTotales++;
-            tiempoAcumuladoGeneralMs += tiempoObservadoMs;
-
-            let selectEl = document.getElementById('select-elemento');
-            let indexSel = parseInt(selectEl.value);
-
-            if(!isNaN(indexSel) && elementosEstudio[indexSel]) {
-                elementosEstudio[indexSel].tomas.push(tiempoSeg);
-                renderizarTablaElementos();
-                recalcularTotales();
-                
-                let siguienteIndex = (indexSel + 1) % elementosEstudio.length;
-                selectEl.value = siguienteIndex;
-                actualizarSeleccionActiva();
-            }
-
-            document.getElementById('txt-lap').innerText = formatearTiempo(tiempoObservadoMs);
-            document.getElementById('txt-acumulado').innerText = formatearTiempo(tiempoAcumuladoGeneralMs);
-            document.getElementById('txt-tomas').innerText = "Tomas: " + contadorTomasTotales;
-
-            tiempoInicioElemento = Date.now();
-            document.getElementById('display-cronometro').innerText = "00:00.00";
-        }
-
-        function formatearTiempo(ms) {
-            let min = Math.floor(ms / 60000);
-            let seg = Math.floor((ms % 60000) / 1000);
-            let cent = Math.floor((ms % 1000) / 10);
-            return (min < 10 ? "0" : "") + min + ":" + 
-                   (seg < 10 ? "0" : "") + seg + "." + 
-                   (cent < 10 ? "0" : "") + cent;
-        }
-
-        function enviarAGoogleSheets() {
-            const urlGoogleScript = "https://script.google.com/macros/s/AKfycbyfGLHl4yMe4zGbstosCyJAMwBIUuWBseR_egpoNOqKqx4fme7rh_drkNAEt1cD4y-Uig/exec";
-
-            let cicloTotalVal = document.getElementById('txt-ciclo-total').innerText.replace('s', '').trim();
-
-            let datosEstudio = {
-                estudio: document.getElementById('input-estudio').value,
-                operario: document.getElementById('input-operario').value,
-                taktTime: document.getElementById('input-takt').value,
-                cicloTotalOperacion: cicloTotalVal,
-                elementos: elementosEstudio
-            };
-
-            let btnOriginal = document.querySelector('button[onclick="enviarAGoogleSheets()"]');
-            let textoAntiguo = btnOriginal.innerHTML;
-            btnOriginal.innerHTML = "<span>⏳</span><span>Enviando...</span>";
-            btnOriginal.disabled = true;
-
-            fetch(urlGoogleScript, {
-                method: "POST",
-                mode: "no-cors",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(datosEstudio)
-            })
-            .then(() => {
-                alert("¡Estudio enviado a Google Sheets con éxito!");
-                btnOriginal.innerHTML = textoAntiguo;
-                btnOriginal.disabled = false;
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("Hubo un error al enviar los datos.");
-                btnOriginal.innerHTML = textoAntiguo;
-                btnOriginal.disabled = false;
-            });
-        }
-
-        function exportarJSON() {
-            let datosEstudio = {
-                estudio: document.getElementById('input-estudio').value,
-                operario: document.getElementById('input-operario').value,
-                taktTime: document.getElementById('input-takt').value,
-                cicloTotalOperacion: document.getElementById('txt-ciclo-total').innerText,
-                elementos: elementosEstudio
-            };
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosEstudio, null, 2));
-            let a = document.createElement('a');
-            a.href = dataStr;
-            a.download = "IE_Pro_Respaldo_Estudio.json";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-    </script>
-</body>
-</html>
+            if (
