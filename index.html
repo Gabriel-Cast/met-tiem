@@ -1,24 +1,23 @@
-<!DOCTYPE html><!-- v3.6.5-nocache -->
+<!DOCTYPE html><!-- v3.7.0-sheets -->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IE-Pro v3.6 - Ingeniería Industrial & Métodos y Tiempos</title>
+    <title>IE-Pro v3.7 - Ingeniería Industrial & Google Sheets</title>
 
-    <!-- Script de Emergencia: Destruye Service Workers viejos que bloquean la app -->
+    <!-- Script de Emergencia: Destruye Service Workers viejos -->
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
                 for(let registration of registrations) {
                     registration.unregister();
-                    console.log('Service Worker eliminado con éxito');
                 }
             });
         }
     </script>
 
-    <!-- Vinculación del Manifiesto e Ícono Personalizado para Celular -->
-    <link rel="manifest" href="./manifest.json?v=365">
+    <!-- Vinculación del Manifiesto e Ícono Personalizado -->
+    <link rel="manifest" href="./manifest.json?v=370">
     <link rel="icon" type="image/png" sizes="512x512" href="./app.png">
     <link rel="apple-touch-icon" sizes="512x512" href="./app.png">
 
@@ -30,8 +29,6 @@
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Librería SheetJS para descargas reales de Excel (.xlsx) -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
     <style>
         body {
@@ -60,15 +57,15 @@
                 <div>
                     <div class="flex items-center space-x-2">
                         <h1 class="text-xl font-bold tracking-wide">IE-Pro</h1>
-                        <span class="bg-blue-600/30 text-blue-400 text-xs px-2 py-0.5 rounded border border-blue-500/30 font-semibold">v3.6.5</span>
+                        <span class="bg-emerald-600/30 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/30 font-semibold">Sheets v3.7</span>
                     </div>
                     <p class="text-xs text-gray-400">Ingeniería Industrial & Métodos y Tiempos</p>
                 </div>
             </div>
 
             <div class="flex flex-wrap gap-2">
-                <button onclick="descargarExcelNativo()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
-                    <span>📥</span><span>Descargar Excel Completo</span>
+                <button onclick="enviarAGoogleSheets()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
+                    <span>☁️</span><span>Guardar en Google Sheets</span>
                 </button>
                 <button onclick="exportarJSON()" class="bg-[#21262d] hover:bg-[#30363d] text-gray-300 border border-[#30363d] text-xs font-semibold px-3 py-2 rounded-lg shadow transition flex items-center space-x-1.5">
                     <span>💾</span><span>Resp. JSON</span>
@@ -224,7 +221,7 @@
         <!-- SECCIONES EXTRAS -->
         <div id="seccion-contenido-extra" class="hidden app-card p-6 rounded-xl shadow-lg space-y-4 text-center">
             <h2 id="titulo-seccion-activa" class="text-lg font-bold text-amber-400">Módulo en Carga</h2>
-            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura industrial de IE-Pro v3.6.5.</p>
+            <p class="text-sm text-gray-300">Este módulo operativo está sincronizado con la estructura industrial de IE-Pro v3.7.</p>
             <button onclick="cambiarTab(1)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow transition">
                 ← Volver al Cronómetro Principal
             </button>
@@ -232,7 +229,7 @@
 
     </div>
 
-    <!-- Script Robusto de Registro Consecutivo -->
+    <!-- Script de Integración con Google Sheets -->
     <script>
         let timerInterval = null;
         let tiempoInicioElemento = 0;
@@ -529,74 +526,48 @@
                    (cent < 10 ? "0" : "") + cent;
         }
 
-        function descargarExcelNativo() {
-            if (typeof XLSX === 'undefined') {
-                alert('La librería de Excel se está cargando. Intente de nuevo.');
+        // --- FUNCIÓN DE ENVÍO DIRECTO A GOOGLE SHEETS ---
+        function enviarAGoogleSheets() {
+            // PEGA AQUÍ ABAJO LA URL DE TU APLICACIÓN WEB DE APPS SCRIPT
+            const urlGoogleScript = "https://script.google.com/macros/s/TU_URL_DE_APPS_SCRIPT_AQUI/exec";
+
+            if(urlGoogleScript.includes("TU_URL_DE_APPS_SCRIPT")) {
+                alert("Por favor, configura la URL de tu Google Apps Script en el código JS de la app.");
                 return;
             }
 
-            let estudioVal = document.getElementById('input-estudio').value;
-            let operarioVal = document.getElementById('input-operario').value;
-            let taktVal = document.getElementById('input-takt').value;
+            let datosEstudio = {
+                estudio: document.getElementById('input-estudio').value,
+                operario: document.getElementById('input-operario').value,
+                taktTime: document.getElementById('input-takt').value,
+                elementos: elementosEstudio
+            };
 
-            let wb = XLSX.utils.book_new();
-            
-            let datosResumen = [
-                ["IE-Pro v3.6.5 - Reporte de Estudio de Tiempos"],
-                ["Estudio:", estudioVal],
-                ["Operario:", operarioVal],
-                ["Takt Time (s):", taktVal],
-                [""],
-                ["# / Elemento", "Tipo", "N° Tomas", "To Promedio (s)", "Ritmo (%)", "Tb Básico (s)"]
-            ];
+            // Mostrar aviso visual de carga
+            let btnOriginal = document.querySelector('button[onclick="enviarAGoogleSheets()"]');
+            let textoAntiguo = btnOriginal.innerHTML;
+            btnOriginal.innerHTML = "<span>⏳</span><span>Enviando a la nube...</span>";
+            btnOriginal.disabled = true;
 
-            elementosEstudio.forEach(el => {
-                let promedioTo = calcularPromedio(el.tomas);
-                let tb = (promedioTo * el.ritmo) / 100;
-                datosResumen.push([
-                    el.nombre, 
-                    el.tipo, 
-                    el.tomas.length, 
-                    parseFloat(promedioTo.toFixed(2)), 
-                    el.ritmo, 
-                    parseFloat(tb.toFixed(2))
-                ]);
+            fetch(urlGoogleScript, {
+                method: "POST",
+                mode: "no-cors", // Requerido para evitar bloqueos CORS con Google Scripts
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(datosEstudio)
+            })
+            .then(() => {
+                alert("¡Estudio enviado y registrado en Google Sheets con éxito!");
+                btnOriginal.innerHTML = textoAntiguo;
+                btnOriginal.disabled = false;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Hubo un error al enviar los datos a Google Sheets.");
+                btnOriginal.innerHTML = textoAntiguo;
+                btnOriginal.disabled = false;
             });
-
-            let wsResumen = XLSX.utils.aoa_to_sheet(datosResumen);
-            XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen del Estudio");
-
-            let totalTomasFijas = 10;
-            let encabezadoMatriz = ["# / Elemento", "Tipo", "Ritmo (%)"];
-            for (let i = 1; i <= totalTomasFijas; i++) {
-                encabezadoMatriz.push("Toma " + i + " (s)");
-            }
-            encabezadoMatriz.push("To Promedio (s)");
-
-            let datosMatriz = [
-                ["MATRIZ FIJA DE REGISTRO DE TOMAS DE TIEMPO"],
-                ["Estudio:", estudioVal],
-                [""],
-                encabezadoMatriz
-            ];
-
-            elementosEstudio.forEach(el => {
-                let filaMatriz = [el.nombre, el.tipo, el.ritmo];
-                for (let i = 0; i < totalTomasFijas; i++) {
-                    if (i < el.tomas.length) {
-                        filaMatriz.push(el.tomas[i]);
-                    } else {
-                        filaMatriz.push("");
-                    }
-                }
-                filaMatriz.push(parseFloat(calcularPromedio(el.tomas).toFixed(2)));
-                datosMatriz.push(filaMatriz);
-            });
-
-            let wsMatriz = XLSX.utils.aoa_to_sheet(datosMatriz);
-            XLSX.utils.book_append_sheet(wb, wsMatriz, "Matriz de Tomas");
-
-            XLSX.writeFile(wb, "Estudio_Tiempos_" + estudioVal.replace(/\s+/g, '_') + ".xlsx");
         }
 
         function exportarJSON() {
